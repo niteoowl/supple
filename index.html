@@ -698,23 +698,6 @@
              transition: background-color 0.3s ease;
         }
 
-        .message.ai h1, .message.ai h2, .message.ai h3, .message.ai h4, .message.ai h5, .message.ai h6 { /* Added heading styles */
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-
-        .message.ai h1 { font-size: 2em; }
-        .message.ai h2 { font-size: 1.5em; }
-        .message.ai h3 { font-size: 1.2em; }
-        .message.ai h4 { font-size: 1em; }
-        .message.ai h5 { font-size: 0.8em; }
-        .message.ai h6 { font-size: 0.7em; }
-
-        .message.ai p { /* Added paragraph styles */
-            margin-bottom: 10px;
-        }
-
         .message.ai a { /* Added link styles */
             color: #1a73e8; /* Google Blue */
             text-decoration: none;
@@ -1133,73 +1116,91 @@
         // Store the initial height of the textarea when it contains one line
         let initialTextareaHeight = 0; // Will be set on load
 
-        // Save chat history, current index, and settings to localStorage
+        // Save chat history and current index to localStorage
         function saveState() {
-            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-            localStorage.setItem('currentChatIndex', currentChatIndex);
-            saveSettings(); // Save settings as well
+            try {
+                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+                localStorage.setItem('currentChatIndex', currentChatIndex);
+                console.log("Chat state saved to localStorage."); // Debugging log
+            } catch (e) {
+                console.error("Error saving chat state to localStorage:", e);
+            }
         }
 
-        // Load chat history, current index, and settings from localStorage
+        // Load chat history and current index from localStorage
         function loadState() {
-            const savedHistory = localStorage.getItem('chatHistory');
-            const savedIndex = localStorage.getItem('currentChatIndex');
+            try {
+                const savedHistory = localStorage.getItem('chatHistory');
+                const savedIndex = localStorage.getItem('currentChatIndex');
+                console.log("Attempting to load chat state from localStorage."); // Debugging log
 
-            if (savedHistory) {
-                chatHistory = JSON.parse(savedHistory);
-                displayChatHistory(); // Display loaded history in the sidebar
+                if (savedHistory) {
+                    chatHistory = JSON.parse(savedHistory);
+                    console.log("Loaded chat history:", chatHistory); // Debugging log
+                    displayChatHistory(); // Display loaded history in the sidebar
 
-                if (savedIndex !== null && chatHistory[savedIndex]) {
-                    currentChatIndex = parseInt(savedIndex, 10);
-                    loadChatThread(currentChatIndex); // Load the last active chat thread
+                    if (savedIndex !== null && chatHistory[savedIndex]) {
+                        currentChatIndex = parseInt(savedIndex, 10);
+                        console.log("Loaded current chat index:", currentChatIndex); // Debugging log
+                        loadChatThread(currentChatIndex); // Load the last active chat thread
+                    } else {
+                         // If no valid index saved or chatHistory is empty, start fresh
+                        console.log("No valid index or history empty, starting new chat."); // Debugging log
+                        startNewChat();
+                    }
                 } else {
-                     // If no valid index saved or chatHistory is empty, start fresh
+                     // If no history saved, start fresh
+                    console.log("No chat history found, starting new chat."); // Debugging log
                     startNewChat();
                 }
-            } else {
-                 // If no history saved, start fresh
+
+                // Load dark mode setting from localStorage
+                loadDarkModeSetting();
+
+            } catch (e) {
+                console.error("Error loading chat state or settings from localStorage:", e);
+                // Fallback to starting a new chat and default settings if loading fails
                 startNewChat();
+                applyDarkMode(false); // Default to light mode on error
             }
-
-            loadSettings(); // Load settings after loading chat
         }
 
-        // Save settings to localStorage
-        function saveSettings() {
-            const settings = {
-                darkMode: darkModeToggle.checked
-            };
-            // Save settings object as a JSON string
-            localStorage.setItem('settings', JSON.stringify(settings));
+        // Save dark mode setting to localStorage
+        function saveDarkModeSetting(isDarkMode) {
+            try {
+                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+                console.log("Dark mode setting saved:", isDarkMode); // Debugging log
+            } catch (e) {
+                console.error("Error saving dark mode setting to localStorage:", e);
+            }
         }
 
-        // Load settings from localStorage and apply them
-        function loadSettings() {
-            const savedSettings = localStorage.getItem('settings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                // Check if darkMode setting exists and is a boolean
-                if (typeof settings.darkMode === 'boolean') {
-                    darkModeToggle.checked = settings.darkMode;
-                    applyDarkMode(settings.darkMode);
-                } else {
-                    // Default to light mode if setting is invalid
-                    darkModeToggle.checked = false;
-                    applyDarkMode(false);
-                }
-            } else {
-                // Default settings if none are saved
+        // Load dark mode setting from localStorage and apply
+        function loadDarkModeSetting() {
+            try {
+                const savedMode = localStorage.getItem('darkMode');
+                console.log("Loaded dark mode setting:", savedMode); // Debugging log
+                const isDarkMode = savedMode === 'enabled';
+                darkModeToggle.checked = isDarkMode; // Set the toggle state
+                applyDarkMode(isDarkMode); // Apply the dark mode class
+            } catch (e) {
+                console.error("Error loading dark mode setting from localStorage:", e);
+                // Default to light mode if loading fails
                 darkModeToggle.checked = false;
                 applyDarkMode(false);
             }
         }
 
+
         // Apply or remove dark mode class
         function applyDarkMode(isDarkMode) {
+            console.log("applyDarkMode called with:", isDarkMode); // Debugging log
             if (isDarkMode) {
                 document.body.classList.add('dark-mode');
+                console.log("Added 'dark-mode' class to body."); // Debugging log
             } else {
                 document.body.classList.remove('dark-mode');
+                console.log("Removed 'dark-mode' class from body."); // Debugging log
             }
         }
 
@@ -1421,8 +1422,10 @@
 
         // Dark mode toggle event listener
         darkModeToggle.addEventListener('change', (event) => {
-            applyDarkMode(event.target.checked);
-            saveSettings(); // Save the new setting
+            console.log("Dark mode toggle changed:", event.target.checked); // Debugging log
+            const isDarkMode = event.target.checked;
+            applyDarkMode(isDarkMode);
+            saveDarkModeSetting(isDarkMode); // Save the setting
         });
 
 
@@ -1674,6 +1677,7 @@
             formattedText = formattedText.replace(/<br>[-*_]{3,}<br>/g, '<hr>');
             formattedText = formattedText.replace(/^[-*_]{3,}<br>/gm, '<hr>'); // Handle if it's at the start of a line
             formattedText = formattedText.replace(/<br>[-*_]{3,}$/gm, '<hr>'); // Handle if it's at the end of a line
+            formattedText = formattedText.replace(/^[-*_]{3,}$/gm, '<hr>'); // Handle if it's the only thing on the line
 
 
             return formattedText;
@@ -1710,9 +1714,10 @@
             }, 3000); // Remove after 3 seconds
         }
 
-        // Load state (chat history and settings) when the page loads
+        // Load chat state (history and current index) and settings when the page loads
         window.onload = function() {
-            loadState();
+            console.log("Window loaded. Loading chat state and settings..."); // Debugging log
+            loadState(); // This now includes loading dark mode setting
             // Set initial height after loading state and before dispatching input event
             promptInput.style.height = 'auto'; // Ensure auto height for correct initial measurement
 
@@ -1737,6 +1742,7 @@
             // Trigger the input event logic once on load to adjust for saved text
             const event = new Event('input');
             promptInput.dispatchEvent(event);
+
         };
 
 
