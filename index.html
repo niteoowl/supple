@@ -246,11 +246,7 @@
                  margin-left: 240px; /* Add margin for the sidebar */
              }
              /* Adjust input container position for fixed header and sidebar */
-             .input-container {
-                 bottom: 20px; /* Keep bottom position */
-                 left: 260px; /* Adjust left position to be right of sidebar + padding */
-                 right: 20px; /* Keep right position */
-             }
+             /* Removed fixed left/right, now using max-width and margin auto within the available space */
         }
 
 
@@ -733,8 +729,7 @@
         /* Input container styling */
         .input-container {
             display: flex;
-            left: 300px; /* Default PC position (sidebar width + padding) */
-            right: 20px;
+            /* Removed fixed left/right properties */
             border: 1px solid #ccc;
             border-radius: 25px; /* Default rounded */
             padding: 5px 15px 5px 15px; /* Adjusted padding */
@@ -744,17 +739,31 @@
             bottom: 20px;
             box-sizing: border-box;
             z-index: 10;
-             transition: background-color 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease; /* Added border-radius transition */
+            transition: background-color 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease; /* Added border-radius transition */
+
+            /* Added width and max-width to match chat container */
+            width: 100%; /* Take full width up to max-width */
+            max-width: 768px; /* Match chat container max-width */
+            margin: 0 auto; /* Center horizontally within the available space */
         }
 
-        /* Removed less-rounded style for input container */
 
+        /* Adjust position for PC sidebar */
+        @media (min-width: 769px) {
+            .input-container {
+                 /* Position it within the main content area's horizontal bounds */
+                left: 240px; /* Start after the sidebar */
+                right: 0; /* Go to the right edge of the viewport */
+                /* margin: 0 auto; will then center the max-width element within this space */
+            }
+        }
 
-        /* Mobile input container position */
+         /* Adjust position for Mobile */
          @media (max-width: 768px) {
              .input-container {
-                 left: 20px; /* Adjust left position for mobile */
-                 right: 20px;
+                 left: 20px; /* Match mobile padding */
+                 right: 20px; /* Match mobile padding */
+                 /* margin: 0 auto; will center the max-width element within this space */
              }
          }
 
@@ -776,6 +785,7 @@
             overflow-y: auto; /* Add scrollbar when content exceeds max-height */
             line-height: 1.5; /* Adjust line height for readability */
             font-family: 'Inter', sans-serif; /* Ensure Inter font for input */
+            box-sizing: border-box; /* Added box-sizing */
         }
 
         .input-container button {
@@ -1380,6 +1390,13 @@
             // Removed input container border-radius logic
         });
 
+        // Added focus event listener to trigger height adjustment on focus
+        promptInput.addEventListener('focus', () => {
+            console.log("Textarea focused. Triggering input event for height adjustment."); // Debugging log
+            const event = new Event('input');
+            promptInput.dispatchEvent(event);
+        });
+
 
         sendButton.addEventListener('click', sendMessage);
         newChatButton.addEventListener('click', startNewChat); // Add event listener to PC new chat button
@@ -1733,6 +1750,7 @@
             tempTextarea.style.fontFamily = window.getComputedStyle(promptInput).fontFamily;
             tempTextarea.style.padding = window.getComputedStyle(promptInput).padding;
             tempTextarea.style.lineHeight = window.getComputedStyle(promptInput).lineHeight;
+            tempTextarea.style.boxSizing = 'border-box'; // Match the actual textarea box-sizing
             tempTextarea.value = promptInput.value || promptInput.placeholder; // Use placeholder if no value
             document.body.appendChild(tempTextarea);
             initialTextareaHeight = tempTextarea.scrollHeight;
