@@ -548,14 +548,14 @@
         /* Chat container styling */
         .chat-container {
             width: 100%;
-            max-width: 90%; /* Adjusted max-width */
+            max-width: 768px; /* Adjust max-width to a fixed pixel value or smaller percentage */
             display: flex;
             flex-direction: column;
             margin-top: 20px;
             flex-grow: 1;
             padding: 0 20px;
             box-sizing: border-box;
-            align-self: center;
+            align-self: center; /* Center the container */
         }
 
         /* Message styling */
@@ -568,7 +568,7 @@
             background-color: #fff;
             align-self: flex-start;
             position: relative;
-            max-width: 95%; /* Adjusted max-width */
+            max-width: 95%; /* Adjusted max-width relative to chat-container */
             width: auto; /* Allow width to be determined by content */
             word-wrap: break-word;
         }
@@ -592,7 +592,7 @@
             border-top-left-radius: 0;
             padding: 0;
             box-shadow: none;
-            width: 100%; /* Allow AI message container to take full width */
+            width: 100%; /* Allow AI message container to take full width of chat-container */
         }
 
         /* Reset default margins/padding for elements within .message.ai */
@@ -1755,6 +1755,6 @@
       .catch(err => console.error('Service Worker 등록 실패:', err));
   }
     </script>
-    
+
 </body>
 </html>
