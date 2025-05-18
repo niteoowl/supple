@@ -183,7 +183,7 @@
 
         /* Mobile Header */
         .mobile-header {
-            display: flex; /* Shown by default on mobile */
+            display: flex; /* Changed to flex */
             position: fixed;
             top: 0;
             left: 0;
@@ -195,7 +195,7 @@
             padding: 0 10px;
             box-sizing: border-box;
             z-index: 30; /* Higher than sidebar and overlay */
-            justify-content: space-between; /* Space out menu, logo, new chat */
+            /* Removed justify-content: space-between; */
              transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
@@ -204,6 +204,7 @@
             height: 40px; /* Match PC logo height */
             width: auto;
             display: block; /* Ensure it's treated as a block element */
+            /* Removed absolute centering styles */
         }
 
 
@@ -215,7 +216,7 @@
             background: none;
             cursor: pointer;
             z-index: auto; /* Remove specific z-index */
-            margin-right: 40px; /* Added margin to push it right */
+            margin-right: auto; /* Push to the left */
         }
 
         .mobile-header .new-chat-mobile-button {
@@ -225,7 +226,7 @@
              background: none;
              cursor: pointer;
              z-index: auto;
-             margin-left: 10px; /* Added margin to push it left */
+             margin-left: auto; /* Push to the right */
         }
 
 
@@ -780,14 +781,14 @@
             flex-grow: 1;
             border: none;
             outline: none;
-            padding: 10px 0; /* Adjusted padding */
+            padding: 10px 15px; /* Adjusted padding */
             font-size: 16px;
             /* Removed border-radius here, handled by the container */
             background-color: #fff; /* Default background */
             color: #333; /* Default text color */
              transition: background-color 0.3s ease, color 0.3s ease;
             resize: none; /* Disable textarea resize handle */
-            min-height: 24px; /* Adjusted minimum height to be lower */
+            min-height: 36px; /* Adjusted minimum height */
             max-height: 120px; /* Maximum height before scrolling */
             overflow-y: auto; /* Add scrollbar when content exceeds max-height */
             line-height: 1.5; /* Adjust line height for readability */
@@ -1580,9 +1581,11 @@
             scrollToBottom(); // Scroll to bottom after sending user message
 
             // Add user message to the current history thread
-            chatHistory[currentChatIndex].messages.push({ role: 'user', text: prompt });
-            saveState(); // Save history after adding user message
-            displayChatHistory(); // Update sidebar display (adds new item if it's the first message of a new thread)
+             if (currentChatIndex !== -1) { // Ensure currentChatIndex is valid before pushing
+                 chatHistory[currentChatIndex].messages.push({ role: 'user', text: prompt });
+                 saveState(); // Save history after adding user message
+                 displayChatHistory(); // Update sidebar display (adds new item if it's the first message of a new thread)
+             }
 
 
             getGeminiResponse(prompt);
@@ -1600,10 +1603,12 @@
             }));
 
              // Add the current user prompt to the contents
-            contents.push({
-                 role: 'user',
-                 parts: [{ text: prompt }]
-            });
+            // Note: The user message was already added to chatHistory and displayed,
+            // so we don't need to add it again here for the API call if we are using
+            // the full chatHistory for context.
+            // If the API expects the *current* turn's user message *in addition* to history,
+            // this part might need adjustment based on the specific API requirements.
+            // For now, assuming chatHistory already includes the latest user message.
 
 
             const data = {
@@ -1636,7 +1641,7 @@
 
 
                 // Add AI message to the current history thread
-                 if (currentChatIndex !== -1) {
+                 if (currentChatIndex !== -1) { // Ensure currentChatIndex is valid before pushing
                      chatHistory[currentChatIndex].messages.push({ role: 'ai', text: responseText });
                      saveState(); // Save history after adding AI message
                  }
