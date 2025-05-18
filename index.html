@@ -1410,7 +1410,7 @@
                 saveState(); // Save the current index
                 displayChatHistory(); // Update sidebar active state
             } else {
-                // If the index is invalid (e.g., after deleting the last item), start a new chat
+                // If the index is invalid (e.e.g., after deleting the last item), start a new chat
                 console.error("Attempted to load invalid chat index:", index); // Debugging log
                 startNewChat();
             }
@@ -1657,12 +1657,27 @@
             }
         }
 
-        // Updated formatApiResponse function to handle Markdown for AI messages
+        // Updated formatApiResponse function to handle Markdown for AI messages and open links in new tabs
         function formatApiResponse(text, role) {
             if (role === 'ai') {
                 // Use marked.js to convert Markdown to HTML for AI responses
-                // You might want to configure marked.js options here if needed
-                return marked.parse(text);
+                let html = marked.parse(text);
+
+                // Create a temporary div to parse the HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+
+                // Find all anchor tags within the parsed HTML
+                const links = tempDiv.querySelectorAll('a');
+
+                // Add target="_blank" to each link
+                links.forEach(link => {
+                    link.setAttribute('target', '_blank');
+                });
+
+                // Return the modified HTML content
+                return tempDiv.innerHTML;
+
             } else {
                 // For user messages, just handle simple newlines
                 return text.replace(/\n/g, '<br>');
