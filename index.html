@@ -8,6 +8,8 @@
     <title>SUPPLE AI</title>
     <meta name="description" content="나만의 AI 파트너 서플과 함께 더 똑똑하고 빠르게 정보를 찾아보세요.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -595,43 +597,35 @@
         }
 
         /* Reset default margins/padding for elements within .message.ai */
-        .message.ai b,
-        .message.ai strong,
-        .message.ai em,
-        .message.ai code,
-        .message.ai ul,
-        .message.ai ol, /* Added ol */
-        .message.ai blockquote,
-        .message.ai pre,
-        .message.ai li, /* li is included here */
-        .message.ai table,
-        .message.ai h1, .message.ai h2, .message.ai h3, .message.ai h4, .message.ai h5, .message.ai h6, /* Added headings */
-        .message.ai p, .message.ai a, .message.ai img, .message.ai hr /* Added paragraph, link, image, hr */
-         {
-            margin: 0;
-            padding: 0;
-            /* Add specific padding/margin back in the markdown styles below */
+        .message.ai > *:first-child { /* Target the first child element within .message.ai */
+            margin-top: 0 !important;
+            padding-top: 0 !important;
         }
-
-        /* Ensure list styles are applied within AI messages */
-        .message.ai ul {
-            list-style: disc !important; /* Changed list style to disc */
-            padding-left: 20px !important; /* Ensure indentation */
-            margin-top: 5px !important; /* Ensure margin */
-            margin-bottom: 5px !important; /* Ensure margin */
-        }
-         .message.ai ol {
-            list-style: decimal !important;
-            padding-left: 20px !important;
-            margin-top: 5px !important;
-            margin-bottom: 5px !important;
+         .message.ai > *:last-child { /* Target the last child element within .message.ai */
+             margin-bottom: 0 !important;
+             padding-bottom: 0 !important;
          }
-          .message.ai li {
-              margin-bottom: 5px !important; /* Ensure margin between list items */
-          }
 
 
         /* Styling for AI response markdown elements */
+        .message.ai p { /* Added paragraph margin */
+             margin-bottom: 1em;
+        }
+
+        .message.ai h1, .message.ai h2, .message.ai h3, .message.ai h4, .message.ai h5, .message.ai h6 { /* Added heading margins */
+             margin-top: 1.5em;
+             margin-bottom: 0.5em;
+             font-weight: bold;
+        }
+
+        .message.ai h1 { font-size: 2em; }
+        .message.ai h2 { font-size: 1.75em; }
+        .message.ai h3 { font-size: 1.5em; }
+        .message.ai h4 { font-size: 1.25em; }
+        .message.ai h5 { font-size: 1em; }
+        .message.ai h6 { font-size: 0.875em; }
+
+
         .message.ai pre {
             background-color: #f0f0f0;
             padding: 15px;
@@ -647,7 +641,7 @@
         .message.ai code {
              background-color: #e9e9eb;
              padding: 2px 5px;
-             border-radius: 4px;
+             border-radius: 4immel;
              font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
              font-size: 0.9em;
              transition: background-color 0.3s ease;
@@ -696,6 +690,25 @@
             background-color: #f9f9f9;
              transition: background-color 0.3s ease;
         }
+
+         .message.ai ul, .message.ai ol { /* Added margins for lists */
+             margin-top: 1em;
+             margin-bottom: 1em;
+             padding-left: 20px; /* Ensure indentation */
+         }
+
+         .message.ai ul {
+             list-style: disc; /* Default list style */
+         }
+
+         .message.ai ol {
+             list-style: decimal; /* Default list style */
+         }
+
+         .message.ai li { /* Added margin for list items */
+             margin-bottom: 0.5em;
+         }
+
 
         .message.ai a { /* Added link styles */
             color: #1a73e8; /* Google Blue */
@@ -957,7 +970,7 @@
             color: white;
             border: none;
             padding: 10px 15px;
-            border-radius: 5immel;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
             transition: background-color 0.3s ease;
@@ -1639,120 +1652,18 @@
             }
         }
 
-        // Improved markdown formatting function
+        // Updated formatApiResponse function to handle Markdown for AI messages
         function formatApiResponse(text, role) {
-            let formattedText = text;
-
-            // Basic newline conversion - Convert \n to <br> first
-            formattedText = formattedText.replace(/\n/g, '<br>');
-
-            // Handle headings (#, ##, etc.) - Before lists
-            formattedText = formattedText.replace(/^######\s(.*)$/gm, '<h6>$1</h6>');
-            formattedText = formattedText.replace(/^#####\s(.*)$/gm, '<h5>$1</h5>');
-            formattedText = formattedText.replace(/^####\s(.*)$/gm, '<h4>$1</h4>');
-            formattedText = formattedText.replace(/^###\s(.*)$/gm, '<h3>$1</h3>');
-            formattedText = formattedText.replace(/^##\s(.*)$/gm, '<h2>$1</h2>');
-            formattedText = formattedText.replace(/^#\s(.*)$/gm, '<h1>$1</h1>');
-
-            // Handle Code blocks (```) - Before lists
-            formattedText = formattedText.replace(/```([\w\W]*?)```/g, (match, codeContent) => {
-                const trimmedCode = codeContent.trim();
-                return `<pre><code>${trimmedCode}</code></pre>`;
-            });
-
-            // Handle In-line code (`) - Before lists
-            formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
-
-            // Handle Bullet Lists (*, -, +) and Ordered Lists (1., 2., etc.)
-            // This regex looks for lines starting with *, -, +, or numbers followed by .
-            // It captures consecutive list items as a block.
-            const listRegex = /((?:^|<br>)[\*\-\+]|\d+\.)\s+.*?((?:<br>(?:[\*\-\+]|\d+\.)\s+.*?)*)(?:$|<br>)/gm;
-
-            let lastIndex = 0;
-            let newFormattedText = '';
-            let match;
-
-            while ((match = listRegex.exec(formattedText)) !== null) {
-                // Add text before the current list block
-                newFormattedText += formattedText.substring(lastIndex, match.index);
-
-                const listBlock = match[0];
-                const items = listBlock.split('<br>').filter(item => item.trim() !== '');
-                let listHtml = '';
-                let isOrdered = /^\d+\./.test(items[0].trim()); // Check if the first item is ordered
-
-                if (isOrdered) {
-                    listHtml += '<ol>';
-                } else {
-                    listHtml += '<ul>';
-                }
-
-                items.forEach(item => {
-                    // Remove the markdown list marker and convert to <li>
-                    listHtml += `<li>${item.replace(/^[\*\-\+]?\s+/, '').replace(/^\d+\.\s+/, '').trim()}</li>`;
-                });
-
-                if (isOrdered) {
-                    listHtml += '</ol>';
-                } else {
-                    listHtml += '</ul>';
-                }
-
-                newFormattedText += listHtml;
-                lastIndex = listRegex.lastIndex;
+            if (role === 'ai') {
+                // Use marked.js to convert Markdown to HTML for AI responses
+                // You might want to configure marked.js options here if needed
+                return marked.parse(text);
+            } else {
+                // For user messages, just handle simple newlines
+                return text.replace(/\n/g, '<br>');
             }
-
-            // Add any remaining text after the last list block
-            newFormattedText += formattedText.substring(lastIndex);
-
-            formattedText = newFormattedText;
-
-
-            // Clean up any remaining <br> tags that might be inside ul/ol (edge case)
-            formattedText = formattedText.replace(/<(ul|ol)>(.*?)<\/\1>/gs, (match, tag, content) => {
-                return `<${tag}>` + content.replace(/<br>/g, '') + `</${tag}>`;
-            });
-
-
-            // Bold text (**...**)
-            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<b style="font-size: 1.1em;">$1</b>');
-
-            // Italic text (_..._) - Use <em> for semantic correctness
-            formattedText = formattedText.replace(/_(.*?)_/g, '<em style="font-size: 1.1em;">$1</em>');
-
-            // Blockquote (>)
-            formattedText = formattedText.replace(/^>\s(.*?)$/gm, '<blockquote>$1</blockquote>');
-
-             // Basic Table Handling (simplified)
-             // This is a very basic attempt. Full markdown table parsing is complex.
-             // Assumes a simple header and rows separated by |
-            formattedText = formattedText.replace(/^(.*?\|.*?\|.*?)<br>[-|\s]+<br>((?:(?:.*?\|.*?\|.*?)(?:<br>|$))*)/gm, (match, headerRow, dataRows) => {
-                 const headerCells = headerRow.split('|').map(cell => `<th>${cell.trim()}</th>`).join('');
-                 let tableHtml = `<table><thead><tr>${headerCells}</tr></thead><tbody>`;
-                 const rows = dataRows.split('<br>').filter(row => row.trim() !== '');
-                 rows.forEach(row => {
-                     const dataCells = row.split('|').map(cell => `<td>${cell.trim()}</td>`).join('');
-                     tableHtml += `<tr>${dataCells}</tr>`;
-                 });
-                 tableHtml += `</tbody></table>`;
-                 return tableHtml;
-             });
-
-            // Links ([text](url))
-            formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-            // Images (![alt text](url))
-            formattedText = formattedText.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
-
-            // Horizontal Rule (--- or ***)
-            formattedText = formattedText.replace(/<br>[-*_]{3,}<br>/g, '<hr>');
-            formattedText = formattedText.replace(/^[-*_]{3,}<br>/gm, '<hr>'); // Handle if it's at the start of a line
-            formattedText = formattedText.replace(/<br>[-*_]{3,}$/gm, '<hr>'); // Handle if it's at the end of a line
-            formattedText = formattedText.replace(/^[-*_]{3,}$/gm, '<hr>'); // Handle if it's the only thing on the line
-
-
-            return formattedText;
         }
+
 
         // Function to smoothly scroll to the bottom of the chat container
         function scrollToBottom() {
