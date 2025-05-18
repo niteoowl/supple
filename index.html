@@ -485,11 +485,11 @@
         /* Example conversations styling */
         .example-conversations {
             width: 100%;
-            max-width: 60%; /* Adjusted max-width to 60% */
+            max-width: 768px; /* Match input container max-width */
             display: flex;
             flex-direction: column;
             align-items: center; /* Center the examples */
-            margin-top: 20px;
+            margin: 20px auto; /* Center horizontally and add top margin */
             padding: 0 20px;
             box-sizing: border-box;
             align-self: center;
@@ -729,10 +729,9 @@
         /* Input container styling */
         .input-container {
             display: flex;
-            /* Removed fixed left/right properties */
             border: 1px solid #ccc;
             border-radius: 25px; /* Default rounded */
-            padding: 5px 15px 5px 15px; /* Adjusted padding */
+            padding: 5px 15px; /* Adjusted padding */
             align-items: center;
             background-color: #fff;
             position: fixed;
@@ -742,7 +741,7 @@
             transition: background-color 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease; /* Added border-radius transition */
 
             /* Added width and max-width to match chat container */
-            width: 100%; /* Take full width up to max-width */
+            width: calc(100% - 40px); /* Take full width minus 20px padding on each side on mobile */
             max-width: 768px; /* Match chat container max-width */
             margin: 0 auto; /* Center horizontally within the available space */
         }
@@ -754,18 +753,10 @@
                  /* Position it within the main content area's horizontal bounds */
                 left: 240px; /* Start after the sidebar */
                 right: 0; /* Go to the right edge of the viewport */
+                width: calc(100% - 240px - 40px); /* Adjust width for sidebar and padding */
                 /* margin: 0 auto; will then center the max-width element within this space */
             }
         }
-
-         /* Adjust position for Mobile */
-         @media (max-width: 768px) {
-             .input-container {
-                 left: 20px; /* Match mobile padding */
-                 right: 20px; /* Match mobile padding */
-                 /* margin: 0 auto; will center the max-width element within this space */
-             }
-         }
 
 
         .input-container input,
@@ -867,11 +858,20 @@
              transition: border-bottom-color 0.3s ease;
         }
 
+        /* Remove border-bottom for the last setting item */
         .settings-modal-content .setting-item:last-child {
             border-bottom: none;
             margin-bottom: 0;
             padding-bottom: 0;
         }
+
+        /* Style for the setting item that contains the delete button */
+        .settings-modal-content .setting-item.delete-all-setting {
+            display: block; /* Change to block to allow button to take full width */
+            text-align: center; /* Center the button horizontally */
+            padding-top: 15px; /* Add padding above the button */
+        }
+
 
         .settings-modal-content label {
             font-size: 1.1em;
@@ -946,6 +946,26 @@
           -webkit-transform: translateX(16px);
           -ms-transform: translateX(16px);
           transform: translateX(16px);
+        }
+
+        /* Delete All Button Style - Modified for full width */
+        #deleteAllChatsButton {
+            background-color: #f44336; /* Red background */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            width: 100%; /* Make button full width */
+            text-align: center; /* Center text in button */
+            margin-top: 0; /* Remove top margin */
+            display: block; /* Ensure it takes full width */
+        }
+
+        #deleteAllChatsButton:hover {
+            background-color: #d32f2f; /* Darker red on hover */
         }
 
 
@@ -1071,6 +1091,9 @@
                     <span class="slider"></span>
                 </label>
             </div>
+             <div class="setting-item delete-all-setting">
+                <button id="deleteAllChatsButton">모든 대화 삭제</button>
+            </div>
             </div>
     </div>
 
@@ -1115,6 +1138,8 @@
         const closeSettingsButton = document.getElementById('closeSettingsButton'); // Get the close settings button
         const darkModeToggle = document.getElementById('darkModeToggle'); // Get the dark mode toggle
         const inputContainer = document.getElementById('inputContainer'); // Get the input container div
+        const deleteAllChatsButton = document.getElementById('deleteAllChatsButton'); // Get the delete all chats button
+
 
         const apiKey = 'AIzaSyCIg1Hlmhm4ZYPi6TtPBqkhXsJJsdXJfWY'; // 여기에 실제 API 키를 넣으세요. 이 부분을 발급받으신 키로 교체해주세요.
 
@@ -1300,6 +1325,30 @@
             }
         }
 
+        // Function to delete ALL chat threads
+        function deleteAllChatThreads() {
+             console.log("deleteAllChatThreads called."); // Debugging log
+             if (chatHistory.length === 0) {
+                 showMessageBox("삭제할 대화가 없습니다.");
+                 return;
+             }
+             if (confirm('모든 대화를 정말 삭제하시겠습니까?')) {
+                 console.log("Confirm delete all: Yes"); // Debugging log
+                 chatHistory = []; // Clear the entire array
+                 currentChatIndex = -1; // Reset current index
+                 saveState(); // Save the empty state
+                 displayChatHistory(); // Clear the sidebar display
+                 chatContainer.innerHTML = ''; // Clear the main chat area
+                 initialTextElement.style.display = 'block'; // Show initial text
+                 exampleConversationsElement.style.display = 'flex'; // Show examples
+                 showMessageBox("모든 대화가 삭제되었습니다."); // Show confirmation
+                 settingsModal.classList.remove('visible'); // Close settings modal
+                 overlay.classList.remove('visible'); // Hide overlay
+             } else {
+                 console.log("Confirm delete all: No"); // Debugging log
+             }
+        }
+
 
         // Load a specific chat thread into the main chat area
         function loadChatThread(index) {
@@ -1401,6 +1450,8 @@
         sendButton.addEventListener('click', sendMessage);
         newChatButton.addEventListener('click', startNewChat); // Add event listener to PC new chat button
         newChatMobileButton.addEventListener('click', startNewChat); // Add event listener to Mobile new chat button
+        deleteAllChatsButton.addEventListener('click', deleteAllChatThreads); // Add event listener to delete all chats button
+
 
         // Add event listeners to example conversation items
         document.querySelectorAll('.example-conversations li').forEach(item => {
@@ -1521,158 +1572,95 @@
             getGeminiResponse(prompt);
         }
 
-        async function getGeminiResponse(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-             // Include previous messages in the request for context
-            const contents = chatHistory[currentChatIndex].messages.map(msg => ({
-                 role: msg.role === 'user' ? 'user' : 'model', // API expects 'user' or 'model'
-                 parts: [{ text: msg.text }]
-            }));
-
-             // Add the current user prompt to the contents
-            contents.push({
-                 role: 'user',
-                 parts: [{ text: prompt }]
-            });
-
-
-            const data = {
-                "contents": contents
-            };
-
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const responseData = await response.json();
-                // Check if candidates and parts exist before accessing text
-                const responseText = responseData.candidates && responseData.candidates[0] && responseData.candidates[0].content && responseData.candidates[0].content.parts && responseData.candidates[0].content.parts[0] ? responseData.candidates[0].content.parts[0].text : "응답을 받을 수 없습니다.";
-
-
-                const aiMessageElement = document.createElement('div');
-                aiMessageElement.classList.add('message', 'ai');
-                // Use formatApiResponse for AI messages
-                aiMessageElement.innerHTML = formatApiResponse(responseText, 'ai');
-                chatContainer.appendChild(aiMessageElement);
-
-                scrollToBottom(); // Scroll to bottom after receiving AI message
-
-
-                // Add AI message to the current history thread
-                 if (currentChatIndex !== -1) {
-                     chatHistory[currentChatIndex].messages.push({ role: 'ai', text: responseText });
-                     saveState(); // Save history after adding AI message
-                 }
-
-
-            } catch (error) {
-                const errorMessage = document.createElement('div');
-                errorMessage.classList.add('message', 'error');
-                errorMessage.textContent = `오류 발생: ${error.message}`;
-                chatContainer.appendChild(errorMessage);
-                console.error("Error:", error);
-                scrollToBottom(); // Scroll to bottom even on error
-            }
-        }
-
         // Improved markdown formatting function
         function formatApiResponse(text, role) {
             let formattedText = text;
 
-            // Basic newline conversion - Convert \n to <br> first
-            formattedText = formattedText.replace(/\n/g, '<br>');
-
-            // Handle headings (#, ##, etc.) - Before lists
-            formattedText = formattedText.replace(/^######\s(.*)$/gm, '<h6>$1</h6>');
-            formattedText = formattedText.replace(/^#####\s(.*)$/gm, '<h5>$1</h5>');
-            formattedText = formattedText.replace(/^####\s(.*)$/gm, '<h4>$1</h4>');
-            formattedText = formattedText.replace(/^###\s(.*)$/gm, '<h3>$1</h3>');
-            formattedText = formattedText.replace(/^##\s(.*)$/gm, '<h2>$1</h2>');
-            formattedText = formattedText.replace(/^#\s(.*)$/gm, '<h1>$1</h1>');
-
-            // Handle Code blocks (```) - Before lists
+            // Handle Code blocks (```) - Replace internal newlines with a placeholder
             formattedText = formattedText.replace(/```([\w\W]*?)```/g, (match, codeContent) => {
                 const trimmedCode = codeContent.trim();
-                return `<pre><code>${trimmedCode}</code></pre>`;
+                const codeWithPlaceholders = trimmedCode.replace(/\n/g, '[[NEWLINE_IN_CODE]]');
+                return `[[CODE_BLOCK_START]]${codeWithPlaceholders}[[CODE_BLOCK_END]]`; // Use block placeholders
             });
 
-            // Handle In-line code (`) - Before lists
-            formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+            // Split the text into lines based on original newlines
+            const lines = formattedText.split('\n');
+            let outputLines = [];
+            let inList = false;
+            let currentListTag = ''; // 'ul' or 'ol'
 
-            // Handle Bullet Lists (*, -, +) and Ordered Lists (1., 2., etc.)
-            // This regex looks for lines starting with *, -, +, or numbers followed by .
-            // It captures consecutive list items as a block.
-            const listRegex = /((?:^|<br>)[\*\-\+]|\d+\.)\s+.*?((?:<br>(?:[\*\-\+]|\d+\.)\s+.*?)*)(?:$|<br>)/gm;
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                const isBullet = /^[*\-+]/.test(trimmedLine);
+                const isOrdered = /^\d+\./.test(trimmedLine);
+                const isListItem = isBullet || isOrdered;
 
-            let lastIndex = 0;
-            let newFormattedText = '';
-            let match;
+                if (isListItem) {
+                    const listTag = isOrdered ? 'ol' : 'ul';
+                    // Remove the markdown list marker and leading/trailing spaces
+                    const listItemContent = line.replace(/^[\*\-+]?\s+/, '').replace(/^\d+\.\s+/, '').trim();
 
-            while ((match = listRegex.exec(formattedText)) !== null) {
-                // Add text before the current list block
-                newFormattedText += formattedText.substring(lastIndex, match.index);
-
-                const listBlock = match[0];
-                const items = listBlock.split('<br>').filter(item => item.trim() !== '');
-                let listHtml = '';
-                let isOrdered = /^\d+\./.test(items[0].trim()); // Check if the first item is ordered
-
-                if (isOrdered) {
-                    listHtml += '<ol>';
+                    if (!inList || currentListTag !== listTag) {
+                        // If ending a previous list, close it
+                        if (inList) {
+                            outputLines.push(`</${currentListTag}>`);
+                        }
+                        // Start new list
+                        currentListTag = listTag;
+                        outputLines.push(`<${currentListTag}>`);
+                        inList = true;
+                    }
+                    // Add list item
+                    outputLines.push(`<li>${listItemContent}</li>`);
                 } else {
-                    listHtml += '<ul>';
+                    // If we were in a list, close it
+                    if (inList) {
+                        outputLines.push(`</${currentListTag}>`);
+                        inList = false;
+                        currentListTag = '';
+                    }
+                    // Add non-list line content directly
+                    outputLines.push(line);
                 }
+            });
 
-                items.forEach(item => {
-                    // Remove the markdown list marker and convert to <li>
-                    listHtml += `<li>${item.replace(/^[\*\-\+]?\s+/, '').replace(/^\d+\.\s+/, '').trim()}</li>`;
-                });
-
-                if (isOrdered) {
-                    listHtml += '</ol>';
-                } else {
-                    listHtml += '</ul>';
-                }
-
-                newFormattedText += listHtml;
-                lastIndex = listRegex.lastIndex;
+            // Close the last list if still in one
+            if (inList) {
+                outputLines.push(`</${currentListTag}>`);
             }
 
-            // Add any remaining text after the last list block
-            newFormattedText += formattedText.substring(lastIndex);
+            // Join lines back
+            let finalHtml = outputLines.join('\n');
 
-            formattedText = newFormattedText;
+            // Handle other block-level elements (headings, blockquotes, HR) - Apply globally
+            finalHtml = finalHtml.replace(/^######\s(.*)$/gm, '<h6>$1</h6>');
+            finalHtml = finalHtml.replace(/^#####\s(.*)$/gm, '<h5>$1</h5>');
+            finalHtml = finalHtml.replace(/^####\s(.*)$/gm, '<h4>$1</h4>');
+            finalHtml = finalHtml.replace(/^###\s(.*)$/gm, '<h3>$1</h3>');
+            finalHtml = finalHtml.replace(/^##\s(.*)$/gm, '<h2>$1</h2>');
+            finalHtml = finalHtml.replace(/^#\s(.*)$/gm, '<h1>$1</h1>');
 
+            finalHtml = finalHtml.replace(/^>\s(.*)$/gm, '<blockquote>$1</blockquote>');
 
-            // Clean up any remaining <br> tags that might be inside ul/ol (edge case)
-            formattedText = formattedText.replace(/<(ul|ol)>(.*?)<\/\1>/gs, (match, tag, content) => {
-                return `<${tag}>` + content.replace(/<br>/g, '') + `</${tag}>`;
-            });
+            finalHtml = finalHtml.replace(/^[-*_]{3,}$/gm, '<hr>');
 
+            // Handle Inline code (`) - Apply globally *after* block processing
+            finalHtml = finalHtml.replace(/`(.*?)`/g, '<code>$1</code>');
 
-            // Bold text (**...**)
-            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<b style="font-size: 1.1em;">$1</b>');
+            // Handle Bold text (**...**)
+            finalHtml = finalHtml.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
 
-            // Italic text (_..._) - Use <em> for semantic correctness
-            formattedText = formattedText.replace(/_(.*?)_/g, '<em style="font-size: 1.1em;">$1</em>');
+            // Handle Italic text (_..._)
+            finalHtml = finalHtml.replace(/_(.*?)_/g, '<em>$1</em>');
 
-            // Blockquote (>)
-            formattedText = formattedText.replace(/^>\s(.*?)$/gm, '<blockquote>$1</blockquote>');
+            // Handle Links ([text](url))
+            finalHtml = finalHtml.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-             // Basic Table Handling (simplified)
-             // This is a very basic attempt. Full markdown table parsing is complex.
-             // Assumes a simple header and rows separated by |
-            formattedText = formattedText.replace(/^(.*?\|.*?\|.*?)<br>[-|\s]+<br>((?:(?:.*?\|.*?\|.*?)(?:<br>|$))*)/gm, (match, headerRow, dataRows) => {
+            // Handle Images (![alt text](url))
+            finalHtml = finalHtml.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+
+            // Handle Basic Table Handling (simplified)
+             finalHtml = finalHtml.replace(/^(.*?\|.*?\|.*?)<br>[-|\s]+<br>((?:(?:.*?\|.*?\|.*?)(?:<br>|$))*)/gm, (match, headerRow, dataRows) => {
                  const headerCells = headerRow.split('|').map(cell => `<th>${cell.trim()}</th>`).join('');
                  let tableHtml = `<table><thead><tr>${headerCells}</tr></thead><tbody>`;
                  const rows = dataRows.split('<br>').filter(row => row.trim() !== '');
@@ -1684,20 +1672,18 @@
                  return tableHtml;
              });
 
-            // Links ([text](url))
-            formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-            // Images (![alt text](url))
-            formattedText = formattedText.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+            // Convert remaining newlines to <br>, but *not* inside <pre><code> blocks
+            // Restore newlines inside code blocks from placeholders first
+            finalHtml = finalHtml.replace(/\[\[NEWLINE_IN_CODE\]\]/g, '\n');
+            // Now, convert other newlines to <br>
+            finalHtml = finalHtml.replace(/\n/g, '<br>');
 
-            // Horizontal Rule (--- or ***)
-            formattedText = formattedText.replace(/<br>[-*_]{3,}<br>/g, '<hr>');
-            formattedText = formattedText.replace(/^[-*_]{3,}<br>/gm, '<hr>'); // Handle if it's at the start of a line
-            formattedText = formattedText.replace(/<br>[-*_]{3,}$/gm, '<hr>'); // Handle if it's at the end of a line
-            formattedText = formattedText.replace(/^[-*_]{3,}$/gm, '<hr>'); // Handle if it's the only thing on the line
+            // Restore CODE_BLOCK_START/END placeholders to pre/code tags
+            finalHtml = finalHtml.replace(/\[\[CODE_BLOCK_START\]\]([\w\W]*?)\[\[CODE_BLOCK_END\]\]/g, '<pre><code>$1</code></pre>');
 
 
-            return formattedText;
+            return finalHtml;
         }
 
         // Function to smoothly scroll to the bottom of the chat container
@@ -1717,13 +1703,11 @@
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background-color: #ffc107;
-                color: #333;
+                background-color: #e80000;
+                color: #ffffff;
                 padding: 10px 20px;
                 border-radius: 5px;
-                z-index: 100;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            `;
+                z-index: 100;            `;
             messageBox.textContent = message;
             document.body.appendChild(messageBox);
             setTimeout(() => {
