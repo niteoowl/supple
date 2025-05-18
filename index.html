@@ -239,7 +239,7 @@
 
 
         /* Show PC header and hide mobile header on larger screens */
-        @media (min-width: 769px) {
+        @media (min-width: 1025px) {
             .pc-header {
                 display: flex; /* Show on PC */
             }
@@ -314,7 +314,7 @@
         }
 
         /* Hide sidebar header on mobile as logo is in mobile-header */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .sidebar-header {
                 display: none;
             }
@@ -352,7 +352,7 @@
         }
 
         /* Mobile sidebar menu item text - DO NOT HIDE TEXT */
-         @media (max-width: 768px) {
+         @media (max-width: 1024px) {
              .sidebar-menu li span {
                  display: inline; /* Ensure text is displayed */
              }
@@ -441,7 +441,7 @@
         }
 
          /* Adjust main content padding for mobile header */
-         @media (max-width: 768px) {
+         @media (max-width: 1024px) {
              .main-content {
                  padding-top: 60px; /* Add space for the fixed mobile header */
                  margin-left: 0; /* Ensure no left margin on mobile */
@@ -765,7 +765,7 @@
 
 
         /* Adjust position for PC sidebar */
-        @media (min-width: 769px) {
+        @media (min-width: 1025px) {
             .input-container {
                  /* Position it within the main content area's horizontal bounds */
                 left: 240px; /* Start after the sidebar */
