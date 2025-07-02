@@ -2,1740 +2,281 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" href="image/simbol.png" />
-    <meta name="naver-site-verification" content="f8ba137a01aeec266d07117c5a8fa5269b4b0d42" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUPPLE AI</title>
-    <meta name="description" content="나만의 AI 파트너 서플과 함께 더 똑똑하고 빠르게 정보를 찾아보세요.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+    <title>Supple AI</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Inter font settings */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body {
-            margin: 0;
             font-family: 'Inter', sans-serif;
-            display: flex;
-            height: 100vh;
-            background-color: #f0f0f0;
-            overflow: hidden; /* Prevent body scroll */
-            color: #333; /* Default text color */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for dark mode */
         }
-
-        /* Dark mode styles */
-        body.dark-mode {
-            background-color: #1e1e1e; /* Dark background */
-            color: #e0e0e0; /* Light text color */
-        }
-
-        body.dark-mode .pc-header,
-        body.dark-mode .mobile-header,
-        body.dark-mode .sidebar,
-        body.dark-mode .input-container,
-        body.dark-mode .settings-modal-content {
-            background-color: #2d2d2d; /* Darker background for elements */
-            border-color: #444; /* Darker border color */
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .sidebar-menu li:hover,
-        body.dark-mode .chat-history li:hover {
-            background-color: #3a3a3a; /* Darker hover effect */
-        }
-
-        body.dark-mode .sidebar-menu li.active,
-        body.dark-mode .chat-history li.active {
-             background-color: #4a4a4a; /* Darker active state */
-        }
-
-        body.dark-mode .chat-history li {
-            background-color: #3a3a3a; /* Darker history item background */
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .main-content {
-            background-color: #1e1e1e; /* Dark main content background */
-        }
-
-        body.dark-mode #initialText {
-             color: #ccc; /* Lighter initial text color */
-        }
-
-        body.dark-mode .message.user {
-             background-color: #3a3a3a; /* Darker user message background */
-             color: #e0e0e0;
-        }
-
-         /* AI message text color in dark mode */
-        body.dark-mode .message.ai {
-             color: #e0e0e0; /* White text color for AI messages */
-        }
-
-
-        body.dark-mode .message.ai pre {
-            background-color: #333; /* Darker code block background */
-        }
-
-        body.dark-mode .message.ai code {
-            background-color: #444; /* Darker inline code background */
-        }
-
-        body.dark-mode .message.ai blockquote {
-            border-left-color: #666; /* Darker blockquote border */
-            color: #aaa; /* Lighter blockquote text */
-        }
-
-        body.dark-mode .message.ai table {
-             border-color: #444;
-        }
-
-        body.dark-mode .message.ai th,
-        body.dark-mode .message.ai td {
-             border-color: #444;
-        }
-
-        body.dark-mode .message.ai th {
-            background-color: #3a3a3a; /* Darker table header background */
-        }
-
-        body.dark-mode .message.ai tr:nth-child(even) {
-            background-color: #2d2d2d; /* Darker even row background */
-        }
-
-        body.dark-mode .message.ai a {
-             color: #89b4fa; /* Lighter link color */
-        }
-
-        body.dark-mode .message.ai hr {
-             border-top-color: #444; /* Darker HR color */
-        }
-
-        body.dark-mode .input-container {
-             background-color: #2d2d2d;
-             border-color: #444;
-        }
-
-        body.dark-mode .input-container input,
-        body.dark-mode .input-container textarea { /* Added textarea */
-             background-color: #2d2d2d;
-             color: #e0e0e0;
-        }
-
-        body.dark-mode .input-container button {
-             background-color: #2d2d2d;
-        }
-
-         /* Icon color in dark mode */
-        body.dark-mode .sidebar-menu li img,
-        body.dark-mode .mobile-header .menu-button img,
-        body.dark-mode .mobile-header .new-chat-mobile-button img,
-        body.dark-mode .input-container button img,
-        body.dark-mode .chat-history li .delete-button img {
-             filter: invert(1); /* Invert icon color for dark mode */
-        }
-
-
-        body.dark-mode .functions-item {
-             background-color: #3a3a3a;
-             color: #e0e0e0;
-             border-color: #444;
-             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        body.dark-mode .functions-item:hover {
-             background-color: #10a37f; /* Keep hover color consistent */
-             color: white;
-             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        body.dark-mode .suggestion-item {
-             background-color: #3a3a3a;
-             color: #e0e0e0;
-        }
-
-        body.dark-mode .suggestion-item:hover {
-             background-color: #10a37f; /* Keep hover color consistent */
-             color: white;
-             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-        }
-
-
-        /* PC Header with fixed logo */
-        .pc-header {
-            display: none; /* Hidden by default, shown on PC */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background-color: #fff;
-            border-bottom: 1px solid #e0e0e0;
-            justify-content: center; /* Center logo horizontally */
-            align-items: center;
-            z-index: 10;
-             transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .pc-header img {
-            height: 40px;
-            width: auto;
-        }
-
-        /* Mobile Header */
-        .mobile-header {
-            display: flex; /* Changed to flex */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background-color: #fff;
-            border-bottom: 1px solid #e0e0e0;
-            align-items: center;
-            padding: 0 10px;
-            box-sizing: border-box;
-            z-index: 30; /* Higher than sidebar and overlay */
-            /* Removed justify-content: space-between; */
-             transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        /* Added style for mobile header logo */
-        .mobile-header .header-logo {
-            height: 40px; /* Match PC logo height */
-            width: auto;
-            display: block; /* Ensure it's treated as a block element */
-            /* Removed absolute centering styles */
-        }
-
-
-        .mobile-header .menu-button {
-            /* Buttons are now inside the header, remove fixed positioning */
-            position: static;
-            padding: 0;
-            border: none;
-            background: none;
-            cursor: pointer;
-            z-index: auto; /* Remove specific z-index */
-            margin-right: auto; /* Push to the left */
-        }
-
-        .mobile-header .new-chat-mobile-button {
-             position: static;
-             padding: 0;
-             border: none;
-             background: none;
-             cursor: pointer;
-             z-index: auto;
-             margin-left: auto; /* Push to the right */
-        }
-
-
-        .mobile-header .menu-button img,
-        .mobile-header .new-chat-mobile-button img {
-            width: 24px;
-            height: 24px;
-            display: block;
-        }
-
-
-        /* Show PC header and hide mobile header on larger screens */
-        @media (min-width: 1025px) {
-            .pc-header {
-                display: flex; /* Show on PC */
-            }
-            .mobile-header {
-                display: none; /* Hide on PC */
-            }
-             /* Adjust main content padding for fixed header and margin for sidebar */
-             .main-content {
-                 padding-top: 60px; /* Add space for the fixed PC header */
-                 margin-left: 240px; /* Add margin for the sidebar */
-             }
-             /* Adjust input container position for fixed header and sidebar */
-             /* Removed fixed left/right, now using max-width and margin auto within the available space */
-        }
-
-
-        /* Sidebar styles */
-        .sidebar {
-            width: 240px;
-            background-color: #f7f7f8;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #e0e0e0;
-            flex-shrink: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for mobile and dark mode */
-            z-index: 20; /* Ensure sidebar is above content/overlay */
-        }
-
-        /* PC Sidebar positioning */
-        @media (min-width: 769px) {
-            .sidebar {
-                position: fixed; /* Fix sidebar position */
-                top: 60px; /* Position below the fixed PC header */
-                bottom: 0; /* Extend to the bottom */
-                left: 0; /* Align to the left */
-                height: auto; /* Allow height to be determined by top/bottom */
-                transform: translateX(0); /* Ensure it's visible */
-                box-shadow: none; /* Remove mobile shadow */
-                border-top: 1px solid #e0e0e0; /* Add top border for PC */
-                padding-top: 20px; /* Restore padding top for PC sidebar */
-            }
-        }
-
-
-        /* Mobile sidebar positioning */
-        @media (max-width: 1024px) {
-            .sidebar {
-                position: fixed;
-                top: 60px; /* Position below the mobile header */
-                left: 0;
-                height: calc(100vh - 60px); /* Fill remaining height below header */
-                transform: translateX(-100%); /* Hide sidebar off-screen by default */
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow when open */
-                padding-top: 20px; /* Restore padding top for mobile sidebar content */
-            }
-            .sidebar.open {
-                transform: translateX(0); /* Slide in when open */
-            }
-        }
-
-
-        /* sidebar-header is now only for the logo inside the sidebar on PC */
-        .sidebar-header {
-             display: flex; /* Show by default */
-             align-items: center;
-             justify-content: center; /* Center logo horizontally within sidebar */
-             padding-bottom: 20px;
-             border-bottom: 1px solid #e0e0e0;
-             margin-bottom: 10px;
-        }
-
-        /* Hide sidebar header on mobile as logo is in mobile-header */
-        @media (max-width: 1024px) {
-            .sidebar-header {
-                display: none;
-            }
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .sidebar-menu li {
-            padding: 10px 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.2s ease;
-            border-radius: 5px;
-        }
-
-        .sidebar-menu li:hover {
-            background-color: #f0f0f0;
-        }
-
-        .sidebar-menu li.active {
-            background-color: #e0e0e0;
-            font-weight: 600;
-        }
-
-        .sidebar-menu li img {
-            margin-right: 8px;
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Mobile sidebar menu item text - DO NOT HIDE TEXT */
-         @media (max-width: 1024px) {
-             .sidebar-menu li span {
-                 display: inline; /* Ensure text is displayed */
-             }
-             .sidebar-menu li img {
-                 margin-right: 8px; /* Keep margin */
-             }
-             .sidebar-menu li {
-                 justify-content: flex-start; /* Align items to start */
-             }
-         }
-
-
-        /* Chat History Styles */
-        .chat-history {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .chat-history li {
-             padding: 8px 10px;
-             cursor: pointer;
-             margin-bottom: 5px;
-             background-color: #e9e9eb;
-             border-radius: 5px;
-             font-size: 14px;
-             color: #333;
-             white-space: nowrap;
-             overflow: hidden;
-             text-overflow: ellipsis;
-             transition: background-color 0.2s ease;
-             display: flex; /* Use flexbox to align text and delete button */
-             justify-content: space-between; /* Space out text and button */
-             align-items: center; /* Vertically center items */
-        }
-
-        .chat-history li:hover {
-            background-color: #d0d0d0;
-        }
-
-        .chat-history li.active {
-             background-color: #d0d0d0;
-             font-weight: 600;
-        }
-
-        .chat-history li span {
-            flex-grow: 1; /* Allow text to take up available space */
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-history li .delete-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0 5px; /* Add some padding around the button */
-            margin-left: 10px; /* Add space between text and button */
-            opacity: 0; /* Hide delete button by default */
-            transition: opacity 0.2s ease;
-        }
-
-        .chat-history li:hover .delete-button {
-            opacity: 1; /* Show delete button on hover */
-        }
-
-        .chat-history li .delete-button img {
-            width: 16px; /* Smaller icon for delete */
-            height: 16px;
-            display: block;
-            margin-right: 0; /* Remove margin from icon */
-        }
-
-
-        /* Main content area */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: #fff;
-            position: relative;
-            overflow-y: auto; /* Allow main content to scroll */
-            padding-bottom: 80px; /* Space for fixed input */
-            transition: background-color 0.3s ease;
-        }
-
-         /* Adjust main content padding for mobile header */
-         @media (max-width: 1024px) {
-             .main-content {
-                 padding-top: 60px; /* Add space for the fixed mobile header */
-                 margin-left: 0; /* Ensure no left margin on mobile */
-             }
-         }
-
-
-        /* Custom Scrollbar Styles */
-        .main-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .main-content::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 0;
-        }
-
-        .main-content::-webkit-scrollbar-thumb {
-            background: #a0a0a0;
-            border-radius: 0;
-        }
-
-        .main-content::-webkit-scrollbar-thumb:hover {
-            background: #808080;
-        }
-
-        .main-content {
-            scrollbar-width: thin;
-            scrollbar-color: #a0a0a0 transparent;
-        }
-
-        /* Initial text styling */
-        #initialText {
-            width: 100%;
-            max-width: 90%; /* Adjusted max-width */
-            text-align: center;
-            font-size: 32px; /* Increased font size */
-            font-weight: bold;
-            color: #222;
-            margin-bottom: 10px; /* Adjusted margin */
-            padding-top: 100px; /* Increased padding-top to push it down */
-            box-sizing: border-box;
-            align-self: center;
-             transition: color 0.3s ease;
-        }
-
-        /* Example conversations styling */
-        .example-conversations {
-            width: 100%;
-            max-width: 768px; /* Match input container max-width */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center the examples */
-            margin: 20px auto; /* Center horizontally and add top margin */
-            padding: 0 20px;
-            box-sizing: border-box;
-            align-self: center;
-        }
-
-        .example-conversations h3 {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            color: #555;
-             transition: color 0.3s ease;
-        }
-
-        .example-conversations ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 100%; /* Ensure ul takes full width of its container */
-        }
-
-        .example-conversations li {
-            background-color: #f6f6f6;
-            padding: 12px 20px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            font-size: 16px;
-            color: #333;
-            cursor: pointer;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            text-align: center; /* Center the text in examples */
-             transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .example-conversations li:hover {
-            background-color: #f2f2f2;
-        }
-
-         /* Dark mode for examples */
-         body.dark-mode .example-conversations h3 {
-             color: #aaa;
-         }
-
-         body.dark-mode .example-conversations li {
-             background-color: #3a3a3a;
-             color: #e0e0e0;
-         }
-
-         body.dark-mode .example-conversations li:hover {
-             background-color: #4a4a4a;
-         }
-
-
-        /* Chat container styling */
-        .chat-container {
-            width: 100%;
-            max-width: 768px; /* Adjust max-width to a fixed pixel value or smaller percentage */
-            display: flex;
-            flex-direction: column;
-            margin-top: 20px;
-            flex-grow: 1;
-            padding: 0 20px;
-            box-sizing: border-box;
-            align-self: center; /* Center the container */
-        }
-
-        /* Message styling */
-        .message {
-            padding: 12px 20px;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            font-size: 16px;
-            color: #333;
-            background-color: #fff;
-            align-self: flex-start;
-            position: relative;
-            max-width: 95%; /* Adjusted max-width relative to chat-container */
-            width: auto; /* Allow width to be determined by content */
-            word-wrap: break-word;
-        }
-
-        .message.user {
-            background-color: #f7f7f8;
-            align-self: flex-end;
-            border-radius: 999px; /* Default very rounded */
-            transition: border-radius 0.3s ease; /* Smooth transition */
-        }
-
-        /* Less rounded style for user message when text is long */
-        .message.user.less-rounded {
-            border-radius: 20px; /* Less rounded, same as default message */
-        }
-
-
-        .message.ai {
-            background-color: transparent;
-            align-self: flex-start;
-            border-top-left-radius: 0;
-            padding: 0;
-            box-shadow: none;
-            width: 100%; /* Allow AI message container to take full width of chat-container */
-        }
-
-        /* Reset default margins/padding for elements within .message.ai */
-        .message.ai > *:first-child { /* Target the first child element within .message.ai */
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
-         .message.ai > *:last-child { /* Target the last child element within .message.ai */
-             margin-bottom: 0 !important;
-             padding-bottom: 0 !important;
-         }
-
-
-        /* Styling for AI response markdown elements */
-        .message.ai p { /* Added paragraph margin */
-             margin-bottom: 1em;
-        }
-
-        .message.ai h1, .message.ai h2, .message.ai h3, .message.ai h4, .message.ai h5, .message.ai h6 { /* Added heading margins */
-             margin-top: 1.5em;
-             margin-bottom: 0.5em;
-             font-weight: bold;
-        }
-
-        .message.ai h1 { font-size: 2em; }
-        .message.ai h2 { font-size: 1.75em; }
-        .message.ai h3 { font-size: 1.5em; }
-        .message.ai h4 { font-size: 1.25em; }
-        .message.ai h5 { font-size: 1em; }
-        .message.ai h6 { font-size: 0.875em; }
-
-
-        .message.ai pre {
-            background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-            font-size: 0.9em;
-             transition: background-color 0.3s ease;
-        }
-
-        .message.ai code {
-             background-color: #e9e9eb;
-             padding: 2px 5px;
-             border-radius: 4immel;
-             font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-             font-size: 0.9em;
-             transition: background-color 0.3s ease;
-        }
-
-        .message.ai pre code {
-             background-color: transparent;
-             padding: 0;
-             border-radius: 0;
-        }
-
-        .message.ai blockquote {
-            border-left: 4px solid #ccc;
-            margin: 10px 0;
-            padding: 10px 15px;
-            color: #666;
-            font-style: italic;
-             transition: border-left-color 0.3s ease, color 0.3s ease;
-        }
-
-        .message.ai table {
-            border-collapse: collapse;
-            margin: 10px 0;
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto;
-            display: block;
-             transition: border-color 0.3s ease;
-        }
-
-        .message.ai th,
-        .message.ai td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-             transition: border-color 0.3s ease;
-        }
-
-        .message.ai th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-             transition: background-color 0.3s ease;
-        }
-
-        .message.ai tr:nth-child(even) {
-            background-color: #f9f9f9;
-             transition: background-color 0.3s ease;
-        }
-
-         .message.ai ul, .message.ai ol { /* Added margins for lists */
-             margin-top: 1em;
-             margin-bottom: 1em;
-             padding-left: 20px; /* Ensure indentation */
-         }
-
-         .message.ai ul {
-             list-style: disc; /* Default list style */
-         }
-
-         .message.ai ol {
-             list-style: decimal; /* Default list style */
-         }
-
-         .message.ai li { /* Added margin for list items */
-             margin-bottom: 0.5em;
-         }
-
-
-        .message.ai a { /* Added link styles */
-            color: #1a73e8; /* Google Blue */
-            text-decoration: none;
-             transition: color 0.3s ease;
-        }
-
-        .message.ai a:hover {
-            text-decoration: underline;
-        }
-
-        .message.ai img { /* Added image styles */
-            max-width: 100%;
-            height: auto;
-            display: block; /* Prevent extra space below image */
-            margin: 10px 0;
-            border-radius: 8px;
-        }
-
-        .message.ai hr { /* Added horizontal rule styles */
-            border: none;
-            border-top: 1px solid #ccc;
-            margin: 20px 0;
-             transition: border-top-color 0.3s ease;
-        }
-
-
-        /* Arrow styling - Removed */
-        .message::before {
+        /* Hide scrollbar for textarea (optional) */
+        textarea::-webkit-scrollbar {
             display: none;
         }
-
-
-        /* Input container styling */
-        .input-container {
-            display: flex;
-            border: 1px solid #ccc;
-            border-radius: 25px; /* Default rounded */
-            padding: 5px 15px; /* Adjusted padding */
-            align-items: center;
-            background-color: #fff;
-            position: fixed;
-            bottom: 20px;
-            box-sizing: border-box;
-            z-index: 10;
-            transition: background-color 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease; /* Added border-radius transition */
-
-            /* Explicit left/right for mobile padding */
-            left: 20px;
-            right: 20px;
-            max-width: 768px; /* Keep max-width */
+        textarea {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
-
-
-        /* Adjust position for PC sidebar */
-        @media (min-width: 1025px) {
-            .input-container {
-                 /* Position it within the main content area's horizontal bounds */
-                left: 240px; /* Start after the sidebar */
-                right: 0; /* Go to the right edge of the viewport */
-                width: calc(100% - 240px - 40px); /* Adjust width for sidebar and padding */
-                margin: 0 auto; /* Center the max-width element within this space */
-            }
-        }
-
-
-        .input-container input,
-        .input-container textarea { /* Added textarea */
-            flex-grow: 1;
-            border: none;
-            outline: none;
-            padding: 10px 15px; /* Adjusted padding */
-            font-size: 16px;
-            /* Removed border-radius here, handled by the container */
-            background-color: #fff; /* Default background */
-            color: #333; /* Default text color */
-             transition: background-color 0.3s ease, color 0.3s ease;
-            resize: none; /* Disable textarea resize handle */
-            min-height: 36px; /* Adjusted minimum height */
-            max-height: 120px; /* Maximum height before scrolling */
-            overflow-y: auto; /* Add scrollbar when content exceeds max-height */
-            line-height: 1.5; /* Adjust line height for readability */
-            font-family: 'Inter', sans-serif; /* Ensure Inter font for input */
-            box-sizing: border-box; /* Added box-sizing */
-        }
-
-        .input-container button {
-            background-color: #fff;
-            border: none;
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 50%;
-            margin-left: 10px; /* Added left margin */
-             transition: background-color 0.3s ease;
-        }
-
-        .input-container button img {
-            width: 24px;
-            height: 24px;
-             transition: filter 0.3s ease;
-        }
-
-        /* Overlay when sidebar is open on mobile or settings modal is open */
-        .overlay {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-            z-index: 15; /* Below sidebar/settings modal, above main content */
-        }
-
-        .overlay.visible {
-            display: block;
-        }
-
-        /* Settings Modal Styles */
-        .settings-modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            justify-content: center;
-            align-items: center;
-            z-index: 25; /* Above overlay */
-        }
-
-        .settings-modal.visible {
-            display: flex;
-        }
-
-        .settings-modal-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .settings-modal-content h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-             transition: border-bottom-color 0.3s ease;
-        }
-
-        .settings-modal-content .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-             transition: border-bottom-color 0.3s ease;
-        }
-
-        /* Remove border-bottom for the last setting item */
-        .settings-modal-content .setting-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        /* Style for the setting item that contains the delete button */
-        .settings-modal-content .setting-item.delete-all-setting {
-            display: block; /* Change to block to allow button to take full width */
-            text-align: center; /* Center the button horizontally */
-            padding-top: 15px; /* Add padding above the button */
-        }
-
-
-        .settings-modal-content label {
-            font-size: 1.1em;
-        }
-
-        .settings-modal-content .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5em;
-            cursor: pointer;
-            border: none;
-            background: none;
-            padding: 5px;
-            line-height: 1;
-            color: #aaa;
-        }
-
-        .settings-modal-content .close-button:hover {
-            color: #666;
-        }
-
-        /* Toggle Switch Styles */
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 40px;
-          height: 24px;
-        }
-
-        .switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          -webkit-transition: .4s;
-          transition: .4s;
-          border-radius: 24px;
-        }
-
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 16px;
-          width: 16px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          -webkit-transition: .4s;
-          transition: .4s;
-          border-radius: 50%;
-        }
-
-        input:checked + .slider {
-          background-color: #10a37f;
-        }
-
-        input:focus + .slider {
-          box-shadow: 0 0 1px #10a37f;
-        }
-
-        input:checked + .slider:before {
-          -webkit-transform: translateX(16px);
-          -ms-transform: translateX(16px);
-          transform: translateX(16px);
-        }
-
-        /* Delete All Button Style - Modified for full width */
-        #deleteAllChatsButton {
-            background-color: #f44336; /* Red background */
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-            width: 100%; /* Make button full width */
-            text-align: center; /* Center text in button */
-            margin-top: 0; /* Remove top margin */
-            display: block; /* Ensure it takes full width */
-        }
-
-        #deleteAllChatsButton:hover {
-            background-color: #d32f2f; /* Darker red on hover */
-        }
-
-
-        /* Functions and Suggestions - Kept original styling */
-        .functions-wrapper {
-            display: none;
-            gap: 15px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        .functions-item {
-            background-color: #fff;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-            font-size: 16px;
-            color: #333;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .functions-item:hover {
-            background-color: #10a37f;
-            color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .suggestions {
-            display: none;
-            gap: 15px;
-            margin-bottom: 0;
-            justify-content: center;
-        }
-
-        .suggestion-item {
-            background-color: #f0f0f0;
-            padding: 8px 16px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .suggestion-item:hover {
-            background-color: #10a37f;
-            color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-        }
-
-
     </style>
 </head>
-<body>
-    <div class="mobile-header">
-        <div class="menu-button" id="menuButton">
-            <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/menu.svg" alt="메뉴">
-        </div>
-        <img src="/image/logo.png" alt="SUPPLE 로고" class="header-logo">
-        <div class="new-chat-mobile-button" id="newChatMobileButton">
-            <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/plus.svg" alt="새 채팅">
-        </div>
-    </div>
-
-
-    <div class="pc-header">
-        <img src="/image/logo.png" alt="SUPPLE 로고">
-    </div>
-
-    <div class="sidebar" id="sidebar">
-        <ul class="sidebar-menu">
-            <li class="active">
-                <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/message-square.svg" alt="채팅">
-                <span>채팅</span>
-            </li>
-             <li id="settingsButton">
-                <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/settings.svg" alt="설정">
-                <span>설정</span>
-            </li>
-        </ul>
-        <ul class="chat-history" id="chatHistory">
-            </ul>
-        <div class="sidebar-menu">
-            <li id="newChatButton">
-                <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/plus-circle.svg" alt="새 채팅">
-                <span>새 채팅</span>
-            </li>
-        </div>
-    </div>
-
-    <div class="overlay" id="overlay"></div>
-
-    <div class="settings-modal" id="settingsModal">
-        <div class="settings-modal-content">
-            <button class="close-button" id="closeSettingsButton">&times;</button>
-            <h2>설정</h2>
-            <div class="setting-item">
-                <label for="darkModeToggle">다크 모드</label>
-                <label class="switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-             <div class="setting-item delete-all-setting">
-                <button id="deleteAllChatsButton">모든 대화 삭제</button>
-            </div>
-            </div>
-    </div>
-
-
-    <div class="main-content" id="mainContent">
-        <div id="initialText">무엇을 도와드릴까요?</div>
-        <div class="example-conversations">
-            <h3>이렇게 질문해보세요</h3>
-            <ul>
-                <li>생일파티 초대장 작성해줘.</li>
-                <li>파이썬으로 "Hello, World!" 출력하는 코드 알려줘.</li>
-                <li>우리나라 인구 수는 몇 명이니?</li>
-            </ul>
-        </div>
-        <div class="chat-container" id="chatContainer">
-            </div>
-        </div>
-
-    <div class="input-container" id="inputContainer">
-        <textarea id="promptInput" placeholder="여기에 텍스트를 입력하세요"></textarea>
-        <button id="sendButton">
-            <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/send.svg" alt="전송">
+<body class="flex h-screen bg-[#212121] text-gray-100">
+    <!-- Sidebar -->
+    <!-- Initial classes are set in JS. transition-all is kept for smooth transitions. -->
+    <div id="sidebar" class="flex flex-col bg-[#181818] rounded-lg transition-all duration-300 ease-in-out">
+        <!-- Mobile sidebar close button (only visible when sidebar is open on mobile) -->
+        <button id="close-sidebar-button" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-100 focus:outline-none hidden">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
         </button>
+
+        <!-- Sidebar inner content (hidden when sidebar is closed) -->
+        <div id="sidebar-inner-content" class="flex flex-col h-full p-4 transition-opacity duration-300">
+            <div class="flex-grow">
+                <!-- New Chat Button -->
+                <button class="w-full flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-gray-100 bg-[#303030] rounded-lg hover:bg-[#212121] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    새 채팅
+                </button>
+
+                <!-- Chat History (Placeholder) -->
+                <div class="space-y-2">
+                    <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                        오늘의 뉴스 요약
+                    </div>
+                    <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                        여행 계획 세우기
+                    </div>
+                    <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                        새로운 레시피 추천
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar bottom menu -->
+            <div class="border-t border-gray-700 pt-4 space-y-2">
+                <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    플랜 업그레이드
+                </div>
+                <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z"></path>
+                    </svg>
+                    다크 모드
+                </div>
+                <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    업데이트 & FAQ
+                </div>
+                <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H5a3 3 0 01-3-3v-10a3 3 0 013-3h5a3 3 0 013 3v1"></path>
+                    </svg>
+                    로그아웃
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Main content area -->
+    <div class="flex flex-col flex-1">
+        <!-- Header -->
+        <header class="flex items-center justify-between p-4 bg-[#212121] border-b border-gray-700 shadow-md">
+            <!-- Mobile hamburger button (hidden on md and larger screens) -->
+            <button id="mobile-hamburger-button" class="md:hidden p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <!-- Desktop sidebar toggle button (hidden on mobile) -->
+            <button id="desktop-sidebar-toggle-button" class="hidden md:block p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <!-- Supple AI title (always centered) -->
+            <h1 class="text-2xl font-bold text-gray-100 flex-grow text-center">Supple AI</h1>
+
+            <!-- Placeholder for right margin -->
+            <div class="w-6 h-6"></div>
+        </header>
+
+        <!-- Chat message area -->
+        <main class="flex-1 overflow-y-auto p-6 flex items-center justify-center">
+            <div class="text-center text-gray-500">
+                <!-- Replaced icon with "Hello." text -->
+                <div class="text-5xl font-bold text-gray-400 mb-4">Hello.</div>
+                <p class="text-lg">무엇을 도와드릴까요?</p>
+            </div>
+        </main>
+
+        <!-- Input container -->
+        <div class="p-4 bg-[#212121] flex items-end justify-center">
+            <!-- Removed border-gray-600 from here -->
+            <div class="relative flex items-start max-w-3xl w-full bg-[#303030] rounded-3xl px-4 pt-4 pb-16">
+                <!-- Left elements: Plus icon and Hash icon moved to bottom-left, increased size and added circular background -->
+                <div class="absolute left-4 bottom-4 flex items-center space-x-2 flex-shrink-0">
+                    <button class="p-2 bg-[#212121] rounded-full text-gray-400 hover:bg-[#121212] focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                        <!-- Plus icon -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 bg-[#212121] rounded-full text-gray-400 hover:bg-[#121212] focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                        <!-- Hash icon -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-4h4l4 4V8l-4-4H7v8z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <textarea
+                    class="flex-1 bg-transparent text-gray-100 resize-none focus:outline-none overflow-hidden pr-12 pl-1"
+                    rows="1"
+                    placeholder="무엇이든 물어보세요"
+                    style="min-height: 48px;"
+                    oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
+                ></textarea>
+
+                <!-- Red upload button moved inside, size and y-coordinate aligned -->
+                <button class="absolute right-4 bottom-4 p-2 bg-red-600 hover:bg-red-700 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Disclaimer text moved to the very bottom -->
+        <p class="text-center text-xs text-gray-500 mb-4">
+            Supple AI는 오류가 발생할 수 있습니다. 중요한 정보는 확인해 주세요.
+        </p>
+    </div>
 
     <script>
-        const promptInput = document.getElementById('promptInput');
-        const sendButton = document.getElementById('sendButton');
-        const chatContainer = document.getElementById('chatContainer');
-        const initialTextElement = document.getElementById('initialText');
-        const exampleConversationsElement = document.querySelector('.example-conversations'); // Get the example conversations container
-        const chatHistoryElement = document.getElementById('chatHistory'); // Get the history list element
-        const newChatButton = document.getElementById('newChatButton'); // Get the PC new chat button
-        const newChatMobileButton = document.getElementById('newChatMobileButton'); // Get the Mobile new chat button
-        const mainContent = document.getElementById('mainContent'); // Get the main content area for scrolling
-        const sidebar = document.getElementById('sidebar'); // Get the sidebar element
-        const menuButton = document.getElementById('menuButton'); // Get the menu button
-        const overlay = document.getElementById('overlay'); // Get the overlay
-        const settingsButton = document.getElementById('settingsButton'); // Get the settings button
-        const settingsModal = document.getElementById('settingsModal'); // Get the settings modal
-        const closeSettingsButton = document.getElementById('closeSettingsButton'); // Get the close settings button
-        const darkModeToggle = document.getElementById('darkModeToggle'); // Get the dark mode toggle
-        const inputContainer = document.getElementById('inputContainer'); // Get the input container div
-        const deleteAllChatsButton = document.getElementById('deleteAllChatsButton'); // Get the delete all chats button
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileHamburgerButton = document.getElementById('mobile-hamburger-button');
+            const desktopSidebarToggleButton = document.getElementById('desktop-sidebar-toggle-button');
+            const sidebar = document.getElementById('sidebar');
+            const closeSidebarButton = document.getElementById('close-sidebar-button');
+            const sidebarInnerContent = document.getElementById('sidebar-inner-content'); // Sidebar inner content div
 
+            // isSidebarOpen indicates whether the sidebar should be open in the current viewport.
+            let isSidebarOpen = window.innerWidth >= 768; // Open by default on desktop, closed on mobile
 
-        const apiKey = 'AIzaSyCIg1Hlmhm4ZYPi6TtPBqkhXsJJsdXJfWY'; // 여기에 실제 API 키를 넣으세요. 이 부분을 발급받으신 키로 교체해주세요.
+            // Function to update sidebar visibility
+            function updateSidebarVisibility() {
+                if (window.innerWidth >= 768) { // Desktop view
+                    // Remove mobile-specific classes and show desktop button
+                    sidebar.classList.remove('absolute', 'inset-y-0', 'left-0', 'z-50', 'hidden');
+                    closeSidebarButton.classList.add('hidden');
+                    mobileHamburgerButton.classList.add('hidden');
+                    desktopSidebarToggleButton.classList.remove('hidden');
 
-        // Array to store chat history data
-        let chatHistory = [];
-        // Variable to track the index of the currently active chat thread
-        let currentChatIndex = -1;
-
-        // Store the initial height of the textarea when it contains one line
-        let initialTextareaHeight = 0; // Will be set on load
-
-        // Save chat history and current index to localStorage
-        function saveState() {
-            try {
-                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-                localStorage.setItem('currentChatIndex', currentChatIndex);
-                console.log("Chat state saved to localStorage."); // Debugging log
-            } catch (e) {
-                console.error("Error saving chat state to localStorage:", e);
-            }
-        }
-
-        // Load chat history and current index from localStorage
-        function loadState() {
-            try {
-                const savedHistory = localStorage.getItem('chatHistory');
-                const savedIndex = localStorage.getItem('currentChatIndex');
-                console.log("Attempting to load chat state from localStorage."); // Debugging log
-
-                if (savedHistory) {
-                    chatHistory = JSON.parse(savedHistory);
-                    console.log("Loaded chat history:", chatHistory); // Debugging log
-                    displayChatHistory(); // Display loaded history in the sidebar
-
-                    if (savedIndex !== null && chatHistory[savedIndex]) {
-                        currentChatIndex = parseInt(savedIndex, 10);
-                        console.log("Loaded current chat index:", currentChatIndex); // Debugging log
-                        loadChatThread(currentChatIndex); // Load the last active chat thread
+                    if (isSidebarOpen) {
+                        sidebar.classList.remove('w-0');
+                        sidebar.classList.add('w-72'); // Apply increased width
+                        sidebarInnerContent.classList.remove('opacity-0', 'pointer-events-none');
+                        sidebarInnerContent.classList.add('opacity-100', 'pointer-events-auto');
                     } else {
-                         // If no valid index saved or chatHistory is empty, start fresh
-                        console.log("No valid index or history empty, starting new chat."); // Debugging log
-                        startNewChat();
+                        sidebar.classList.remove('w-72');
+                        sidebar.classList.add('w-0');
+                        sidebarInnerContent.classList.remove('opacity-100', 'pointer-events-auto');
+                        sidebarInnerContent.classList.add('opacity-0', 'pointer-events-none');
                     }
-                } else {
-                     // If no history saved, start fresh
-                    console.log("No chat history found, starting new chat."); // Debugging log
-                    startNewChat();
+                } else { // Mobile view
+                    // Remove desktop-specific classes and show mobile button
+                    sidebar.classList.remove('w-72', 'w-0');
+                    desktopSidebarToggleButton.classList.add('hidden');
+                    mobileHamburgerButton.classList.remove('hidden');
+
+                    if (isSidebarOpen) { // If isSidebarOpen is true, mobile sidebar should be open
+                        sidebar.classList.remove('hidden');
+                        sidebar.classList.add('absolute', 'inset-y-0', 'left-0', 'z-50', 'w-72'); // Apply increased width
+                        closeSidebarButton.classList.remove('hidden');
+                        sidebarInnerContent.classList.remove('opacity-0', 'pointer-events-none');
+                        sidebarInnerContent.classList.add('opacity-100', 'pointer-events-auto');
+                    } else { // If isSidebarOpen is false, mobile sidebar should be closed
+                        sidebar.classList.remove('absolute', 'inset-y-0', 'left-0', 'z-50', 'w-72');
+                        sidebar.classList.add('hidden');
+                        closeSidebarButton.classList.add('hidden');
+                        sidebarInnerContent.classList.remove('opacity-100', 'pointer-events-auto');
+                        sidebarInnerContent.classList.add('opacity-0', 'pointer-events-none');
+                    }
                 }
-
-                // Load dark mode setting from localStorage
-                loadDarkModeSetting();
-
-            } catch (e) {
-                console.error("Error loading chat state or settings from localStorage:", e);
-                // Fallback to starting a new chat and default settings if loading fails
-                startNewChat();
-                applyDarkMode(false); // Default to light mode on error
             }
-        }
 
-        // Save dark mode setting to localStorage
-        function saveDarkModeSetting(isDarkMode) {
-            try {
-                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-                console.log("Dark mode setting saved:", isDarkMode); // Debugging log
-            } catch (e) {
-                console.error("Error saving dark mode setting to localStorage:", e);
-            }
-        }
-
-        // Load dark mode setting from localStorage and apply
-        function loadDarkModeSetting() {
-            try {
-                const savedMode = localStorage.getItem('darkMode');
-                console.log("Loaded dark mode setting:", savedMode); // Debugging log
-                const isDarkMode = savedMode === 'enabled';
-                darkModeToggle.checked = isDarkMode; // Set the toggle state
-                applyDarkMode(isDarkMode); // Apply the dark mode class
-            } catch (e) {
-                console.error("Error loading dark mode setting from localStorage:", e);
-                // Default to light mode if loading fails
-                darkModeToggle.checked = false;
-                applyDarkMode(false);
-            }
-        }
-
-
-        // Apply or remove dark mode class
-        function applyDarkMode(isDarkMode) {
-            console.log("applyDarkMode called with:", isDarkMode); // Debugging log
-            if (isDarkMode) {
-                document.body.classList.add('dark-mode');
-                console.log("Added 'dark-mode' class to body."); // Debugging log
-            } else {
-                document.body.classList.remove('dark-mode');
-                console.log("Removed 'dark-mode' class from body."); // Debugging log
-            }
-        }
-
-
-        // Display chat history in the sidebar
-        function displayChatHistory() {
-            chatHistoryElement.innerHTML = ''; // Clear current history display
-            chatHistory.forEach((historyItem, index) => {
-                const listItem = document.createElement('li');
-                // Display the first user message as the history item summary
-                const firstUserMessage = historyItem.messages.find(msg => msg.role === 'user');
-                const summaryText = firstUserMessage ? firstUserMessage.text : '새 대화';
-
-                const textSpan = document.createElement('span');
-                textSpan.textContent = summaryText.substring(0, 30) + (summaryText.length > 30 ? '...' : ''); // Truncate for summary
-
-                const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-button');
-                deleteButton.innerHTML = '<img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/x.svg" alt="삭제">'; // Use 'x' icon for delete
-                deleteButton.title = '대화 삭제'; // Add tooltip
-
-                // Add event listener to the delete button
-                deleteButton.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent click from triggering the loadChatThread on the li
-                    console.log("Delete button clicked for index:", index); // Debugging log
-                    deleteChatThread(index); // Call delete function with the index
-                });
-
-
-                listItem.appendChild(textSpan);
-                listItem.appendChild(deleteButton);
-                listItem.dataset.index = index; // Store index for loading full conversation
-
-                // Add active class if this is the current chat
-                if (index === currentChatIndex) {
-                    listItem.classList.add('active');
-                }
-
-                // Add event listener to the list item itself to load the chat thread
-                listItem.addEventListener('click', () => {
-                    console.log("Chat history item clicked for index:", index); // Debugging log
-                    loadChatThread(index); // Load the clicked conversation
-                    closeMobileMenu(); // Close menu after selecting chat on mobile
-                });
-                chatHistoryElement.appendChild(listItem);
+            // Event listener for mobile hamburger button click
+            mobileHamburgerButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevents the click from bubbling up to the document and immediately closing the sidebar
+                isSidebarOpen = true; // Mobile hamburger button always opens the sidebar.
+                updateSidebarVisibility();
             });
-        }
 
-        // Function to delete a specific chat thread
-        function deleteChatThread(index) {
-            console.log("deleteChatThread called with index:", index); // Debugging log
-            if (index >= 0 && index < chatHistory.length) {
-                // Add confirmation before deleting
-                if (confirm('이 대화를 정말 삭제하시겠습니까?')) {
-                    console.log("Confirm delete: Yes"); // Debugging log
-                    console.log("Chat history before splice:", JSON.parse(JSON.stringify(chatHistory))); // Debugging log
-                    console.log("Current chat index before splice:", currentChatIndex); // Debugging log
+            // Event listener for desktop sidebar toggle button click
+            desktopSidebarToggleButton.addEventListener('click', () => {
+                isSidebarOpen = !isSidebarOpen; // Desktop toggle button switches the state.
+                updateSidebarVisibility();
+            });
 
-                    chatHistory.splice(index, 1); // Remove the thread from the array
+            // Event listener for mobile sidebar close button click
+            closeSidebarButton.addEventListener('click', () => {
+                isSidebarOpen = false; // Mobile close button always closes the sidebar.
+                updateSidebarVisibility();
+            });
 
-                    console.log("Chat history after splice:", JSON.parse(JSON.stringify(chatHistory))); // Debugging log
-
-                    // Adjust currentChatIndex if the deleted thread was the active one or before it
-                    if (index === currentChatIndex) {
-                        console.log("Deleted current chat. Starting new chat."); // Debugging log
-                        startNewChat(); // If the active chat was deleted, start a new one
-                    } else if (index < currentChatIndex) {
-                        console.log("Deleted chat before current. Decrementing current index."); // Debugging log
-                        currentChatIndex--; // If a thread before the active one was deleted, decrement the index
-                         saveState(); // Save the updated history and index
-                         displayChatHistory(); // Refresh the sidebar display
-                         // No need to load chat thread, as the current one is still active (at a new index)
-                    } else {
-                         console.log("Deleted chat after current or not current."); // Debugging log
-                         saveState(); // Save the updated history and index
-                         displayChatHistory(); // Refresh the sidebar display
-                         // No change to currentChatIndex or current chat display needed
+            // Handle clicks outside the sidebar on mobile to close it
+            document.addEventListener('click', (event) => {
+                // If current screen width is less than md (768px) and sidebar is visible
+                if (window.innerWidth < 768 && isSidebarOpen) {
+                    // If the clicked element is not inside the sidebar and not the hamburger button
+                    if (!sidebar.contains(event.target) && !mobileHamburgerButton.contains(event.target)) {
+                        isSidebarOpen = false;
+                        updateSidebarVisibility();
                     }
-
-
-                    showMessageBox("대화가 삭제되었습니다."); // Show confirmation message
-                } else {
-                     console.log("Confirm delete: No"); // Debugging log
                 }
-            } else {
-                 console.error("Invalid index provided to deleteChatThread:", index); // Debugging log
-            }
-        }
+            });
 
-        // Function to delete ALL chat threads
-        function deleteAllChatThreads() {
-             console.log("deleteAllChatThreads called."); // Debugging log
-             if (chatHistory.length === 0) {
-                 showMessageBox("삭제할 대화가 없습니다.");
-                 return;
-             }
-             if (confirm('모든 대화를 정말 삭제하시겠습니까?')) {
-                 console.log("Confirm delete all: Yes"); // Debugging log
-                 chatHistory = []; // Clear the entire array
-                 currentChatIndex = -1; // Reset current index
-                 saveState(); // Save the empty state
-                 displayChatHistory(); // Clear the sidebar display
-                 chatContainer.innerHTML = ''; // Clear the main chat area
-                 initialTextElement.style.display = 'block'; // Show initial text
-                 exampleConversationsElement.style.display = 'flex'; // Show examples
-                 showMessageBox("모든 대화가 삭제되었습니다."); // Show confirmation
-                 settingsModal.classList.remove('visible'); // Close settings modal
-                 overlay.classList.remove('visible'); // Hide overlay
-             } else {
-                 console.log("Confirm delete all: No"); // Debugging log
-             }
-        }
+            // Adjust sidebar state on window resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Reset isSidebarOpen to default based on new viewport width on resize
+                    isSidebarOpen = window.innerWidth >= 768; // Open if desktop, closed if mobile
+                    updateSidebarVisibility();
+                }, 100); // Debounce resize event
+            });
 
+            // Initial sidebar visibility update on page load
+            updateSidebarVisibility();
 
-        // Load a specific chat thread into the main chat area
-        function loadChatThread(index) {
-            console.log("loadChatThread called with index:", index); // Debugging log
-            if (index >= 0 && index < chatHistory.length) {
-                currentChatIndex = index;
-                chatContainer.innerHTML = ''; // Clear current chat display
-                initialTextElement.style.display = 'none'; // Hide initial text
-                exampleConversationsElement.style.display = 'none'; // Hide examples
-
-                const threadMessages = chatHistory[currentChatIndex].messages;
-                threadMessages.forEach(message => {
-                    const messageElement = document.createElement('div');
-                    messageElement.classList.add('message', message.role);
-                     // Use formatApiResponse for both user and AI messages for consistent markdown handling
-                    messageElement.innerHTML = formatApiResponse(message.text, message.role);
-                    chatContainer.appendChild(messageElement);
-
-                    // After appending, check if it's a user message and apply less-rounded if needed
-                    if (message.role === 'user') {
-                        // Temporarily set height to auto to get true scrollHeight
-                        messageElement.style.height = 'auto';
-                        const messageScrollHeight = messageElement.scrollHeight;
-
-                        // Get computed styles for line height calculation
-                        const computedStyle = window.getComputedStyle(messageElement);
-                        const lineHeight = parseFloat(computedStyle.lineHeight) || parseFloat(computedStyle.fontSize) * 1.2; // Fallback
-                        const paddingHeight = parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
-                        const estimatedSingleLineHeight = lineHeight + paddingHeight;
-
-                        // Check if the message height is significantly more than one line
-                        // Using a threshold slightly above single line height to account for padding/margins
-                        if (messageScrollHeight > estimatedSingleLineHeight * 1.5) { // Threshold for more than 1 line
-                             messageElement.classList.add('less-rounded');
-                        }
-                         // Reset height if it was changed
-                        messageElement.style.height = ''; // Remove inline style
-                    }
-                });
-
-                scrollToBottom(); // Scroll to bottom after loading thread
-                saveState(); // Save the current index
-                displayChatHistory(); // Update sidebar active state
-            } else {
-                // If the index is invalid (e.e.g., after deleting the last item), start a new chat
-                console.error("Attempted to load invalid chat index:", index); // Debugging log
-                startNewChat();
-            }
-        }
-
-        // Start a new chat conversation
-        function startNewChat() {
-            console.log("startNewChat called."); // Debugging log
-            chatContainer.innerHTML = ''; // Clear current chat display
-            initialTextElement.style.display = 'block'; // Show initial text
-            exampleConversationsElement.style.display = 'flex'; // Show examples
-            currentChatIndex = -1; // No active chat thread initially
-            saveState(); // Save the updated index
-            displayChatHistory(); // Update sidebar (no active item)
-            closeMobileMenu(); // Close menu after starting new chat on mobile
-        }
-
-
-        // Modified keydown listener for textarea
-        promptInput.addEventListener('keydown', (event) => {
-            // If Enter is pressed
-            if (event.key === 'Enter') {
-                // If Shift is also pressed, send the message
-                if (event.shiftKey) {
-                    event.preventDefault(); // Prevent default newline for Shift+Enter
-                    sendMessage();
-                } else {
-                    // If only Enter is pressed, do nothing (allow default newline in textarea)
-                    // No need to preventDefault here unless you want to stop the newline
-                    // event.preventDefault(); // Uncomment this if you want to prevent newline on simple Enter
-                }
-            }
-        });
-
-        // Input event listener to adjust textarea height
-        promptInput.addEventListener('input', () => {
-            // Reset height to auto to correctly calculate scrollHeight
-            promptInput.style.height = 'auto';
-            const scrollHeight = promptInput.scrollHeight;
-
-            // Adjust textarea height to fit content up to max-height
-            promptInput.style.height = Math.min(scrollHeight, 120) + 'px'; // Use 120px max-height from CSS
-            // Removed input container border-radius logic
-        });
-
-        // Added focus event listener to trigger height adjustment on focus
-        promptInput.addEventListener('focus', () => {
-            console.log("Textarea focused. Triggering input event for height adjustment."); // Debugging log
-            const event = new Event('input');
-            promptInput.dispatchEvent(event);
-        });
-
-
-        sendButton.addEventListener('click', sendMessage);
-        newChatButton.addEventListener('click', startNewChat); // Add event listener to PC new chat button
-        newChatMobileButton.addEventListener('click', startNewChat); // Add event listener to Mobile new chat button
-        deleteAllChatsButton.addEventListener('click', deleteAllChatThreads); // Add event listener to delete all chats button
-
-
-        // Add event listeners to example conversation items
-        document.querySelectorAll('.example-conversations li').forEach(item => {
-            item.addEventListener('click', () => {
-                promptInput.value = item.textContent;
-                // Trigger input event to adjust textarea height if needed
-                const event = new Event('input');
-                promptInput.dispatchEvent(event);
-                promptInput.focus(); // Focus the input
+            // Textarea auto-height adjustment
+            document.querySelector('textarea').addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
             });
         });
-
-
-        // Settings button event listeners
-        settingsButton.addEventListener('click', () => {
-            settingsModal.classList.add('visible');
-            overlay.classList.add('visible');
-            closeMobileMenu(); // Close sidebar if open
-        });
-
-        closeSettingsButton.addEventListener('click', () => {
-            settingsModal.classList.remove('visible');
-            overlay.classList.remove('visible');
-        });
-
-        // Close settings modal or sidebar when clicking overlay
-        overlay.addEventListener('click', () => {
-             if (settingsModal.classList.contains('visible')) {
-                 settingsModal.classList.remove('visible');
-                 overlay.classList.remove('visible');
-             } else if (sidebar.classList.contains('open')) {
-                 closeMobileMenu();
-             }
-        });
-
-
-        // Dark mode toggle event listener
-        darkModeToggle.addEventListener('change', (event) => {
-            console.log("Dark mode toggle changed:", event.target.checked); // Debugging log
-            const isDarkMode = event.target.checked;
-            applyDarkMode(isDarkMode);
-            saveDarkModeSetting(isDarkMode); // Save the setting
-        });
-
-
-        // Mobile menu toggle functionality
-        menuButton.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('visible');
-        });
-
-        // Function to close the mobile menu
-        function closeMobileMenu() {
-             sidebar.classList.remove('open');
-             overlay.classList.remove('visible');
-        }
-
-
-        function sendMessage() {
-            const prompt = promptInput.value;
-            if (!prompt.trim()) {
-                 // Use a simple message box instead of alert
-                showMessageBox("질문을 입력해주세요.");
-                return;
-            }
-
-            if (initialTextElement) {
-                initialTextElement.style.display = 'none';
-                exampleConversationsElement.style.display = 'none'; // Hide examples when starting chat
-            }
-
-            // If no active chat thread, create a new one
-            if (currentChatIndex === -1) {
-                chatHistory.push({ messages: [] });
-                currentChatIndex = chatHistory.length - 1;
-            }
-
-            const userMessageElement = document.createElement('div');
-            userMessageElement.classList.add('message', 'user');
-            // Use formatApiResponse for user messages as well
-            userMessageElement.innerHTML = formatApiResponse(prompt, 'user');
-            chatContainer.appendChild(userMessageElement);
-
-            // After appending, check its height and apply less-rounded if needed
-            // Temporarily set height to auto to get true scrollHeight
-            userMessageElement.style.height = 'auto';
-            const messageScrollHeight = userMessageElement.scrollHeight;
-
-            // Get computed styles for line height calculation
-            const computedStyle = window.getComputedStyle(userMessageElement);
-            const lineHeight = parseFloat(computedStyle.lineHeight) || parseFloat(computedStyle.fontSize) * 1.2; // Fallback
-            const paddingHeight = parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
-            const estimatedSingleLineHeight = lineHeight + paddingHeight;
-
-
-            // Check if the message height is significantly more than one line
-            if (messageScrollHeight > estimatedSingleLineHeight * 1.5) { // Threshold for more than 1 line
-                 userMessageElement.classList.add('less-rounded');
-            }
-             // Reset height if it was changed
-            userMessageElement.style.height = ''; // Remove inline style
-
-
-            promptInput.value = ''; // Clear textarea after sending
-
-            // Reset textarea height after sending
-            promptInput.style.height = 'auto';
-
-
-            scrollToBottom(); // Scroll to bottom after sending user message
-
-            // Add user message to the current history thread
-             if (currentChatIndex !== -1) { // Ensure currentChatIndex is valid before pushing
-                 chatHistory[currentChatIndex].messages.push({ role: 'user', text: prompt });
-                 saveState(); // Save history after adding user message
-                 displayChatHistory(); // Update sidebar display (adds new item if it's the first message of a new thread)
-             }
-
-
-            getGeminiResponse(prompt);
-        }
-
-        async function getGeminiResponse(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-             // Include previous messages in the request for context
-            const contents = chatHistory[currentChatIndex].messages.map(msg => ({
-                 role: msg.role === 'user' ? 'user' : 'model', // API expects 'user' or 'model'
-                 parts: [{ text: msg.text }]
-            }));
-
-             // Add the current user prompt to the contents
-            // Note: The user message was already added to chatHistory and displayed,
-            // so we don't need to add it again here for the API call if we are using
-            // the full chatHistory for context.
-            // If the API expects the *current* turn's user message *in addition* to history,
-            // this part might need adjustment based on the specific API requirements.
-            // For now, assuming chatHistory already includes the latest user message.
-
-
-            const data = {
-                "contents": contents
-            };
-
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const responseData = await response.json();
-                // Check if candidates and parts exist before accessing text
-                const responseText = responseData.candidates && responseData.candidates[0] && responseData.candidates[0].content && responseData.candidates[0].content.parts && responseData.candidates[0].content.parts[0] ? responseData.candidates[0].content.parts[0].text : "응답을 받을 수 없습니다.";
-
-
-                const aiMessageElement = document.createElement('div');
-                aiMessageElement.classList.add('message', 'ai');
-                // Use formatApiResponse for AI messages
-                aiMessageElement.innerHTML = formatApiResponse(responseText, 'ai');
-                chatContainer.appendChild(aiMessageElement);
-
-                scrollToBottom(); // Scroll to bottom after receiving AI message
-
-
-                // Add AI message to the current history thread
-                 if (currentChatIndex !== -1) { // Ensure currentChatIndex is valid before pushing
-                     chatHistory[currentChatIndex].messages.push({ role: 'ai', text: responseText });
-                     saveState(); // Save history after adding AI message
-                 }
-
-
-            } catch (error) {
-                const errorMessage = document.createElement('div');
-                errorMessage.classList.add('message', 'error');
-                errorMessage.textContent = `오류 발생: ${error.message}`;
-                chatContainer.appendChild(errorMessage);
-                console.error("Error:", error);
-                scrollToBottom(); // Scroll to bottom even on error
-            }
-        }
-
-        // Updated formatApiResponse function to handle Markdown for AI messages and open links in new tabs
-        function formatApiResponse(text, role) {
-            if (role === 'ai') {
-                // Use marked.js to convert Markdown to HTML for AI responses
-                let html = marked.parse(text);
-
-                // Create a temporary div to parse the HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-
-                // Find all anchor tags within the parsed HTML
-                const links = tempDiv.querySelectorAll('a');
-
-                // Add target="_blank" to each link
-                links.forEach(link => {
-                    link.setAttribute('target', '_blank');
-                });
-
-                // Return the modified HTML content
-                return tempDiv.innerHTML;
-
-            } else {
-                // For user messages, just handle simple newlines
-                return text.replace(/\n/g, '<br>');
-            }
-        }
-
-
-        // Function to smoothly scroll to the bottom of the chat container
-        function scrollToBottom() {
-             mainContent.scrollTo({
-                 top: mainContent.scrollHeight,
-                 behavior: 'smooth'
-             });
-         }
-
-
-        // Simple message box function
-        function showMessageBox(message) {
-            const messageBox = document.createElement('div');
-            messageBox.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: #e80000;
-                color: #ffffff;
-                padding: 10px 20px;
-                border-radius: 5px;
-                z-index: 100;            `;
-            messageBox.textContent = message;
-            document.body.appendChild(messageBox);
-            setTimeout(() => {
-                document.body.removeChild(messageBox);
-            }, 3000); // Remove after 3 seconds
-        }
-
-        // Load chat state (history and current index) and settings when the page loads
-        window.onload = function() {
-            console.log("Window loaded. Loading chat state and settings..."); // Debugging log
-            loadState(); // This now includes loading dark mode setting
-            // Set initial height after loading state and before dispatching input event
-            promptInput.style.height = 'auto'; // Ensure auto height for correct initial measurement
-
-            // Calculate initial height based on content, not a fixed min-height
-            // Temporarily convert to textarea to get scrollHeight for initial measurement
-            const tempTextarea = document.createElement('textarea');
-            tempTextarea.style.visibility = 'hidden';
-            tempTextarea.style.position = 'absolute';
-            tempTextarea.style.left = '-9999px';
-            tempTextarea.style.top = '-9999px';
-            tempTextarea.style.width = promptInput.clientWidth + 'px'; // Match the input width
-            tempTextarea.style.fontSize = window.getComputedStyle(promptInput).fontSize;
-            tempTextarea.style.fontFamily = window.getComputedStyle(promptInput).fontFamily;
-            tempTextarea.style.padding = window.getComputedStyle(promptInput).padding;
-            tempTextarea.style.lineHeight = window.getComputedStyle(promptInput).lineHeight;
-            tempTextarea.style.boxSizing = 'border-box'; // Match the actual textarea box-sizing
-            tempTextarea.value = promptInput.value || promptInput.placeholder; // Use placeholder if no value
-            document.body.appendChild(tempTextarea);
-            initialTextareaHeight = tempTextarea.scrollHeight;
-            document.body.removeChild(tempTextarea);
-
-
-            // Trigger the input event logic once on load to adjust for saved text
-            const event = new Event('input');
-            promptInput.dispatchEvent(event);
-
-        };
-
-
     </script>
-
-        <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('Service Worker 등록됨:', reg.scope))
-      .catch(err => console.error('Service Worker 등록 실패:', err));
-  }
-    </script>
-
 </body>
 </html>
