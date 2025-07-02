@@ -158,39 +158,21 @@
         <div id="sidebar-inner-content" class="flex flex-col h-full p-4 transition-opacity duration-300">
             <div class="flex-grow">
                 <!-- New Chat Button -->
-                <button class="w-full flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-gray-100 bg-[#303030] rounded-lg hover:bg-[#212121] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                <button id="new-chat-button" class="w-full flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-gray-100 bg-[#303030] rounded-lg hover:bg-[#212121] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     새 채팅
                 </button>
 
-                <!-- Chat History (Placeholder) -->
-                <div class="space-y-2">
-                    <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                        </svg>
-                        오늘의 뉴스 요약
-                    </div>
-                    <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                        </svg>
-                        여행 계획 세우기
-                    </div>
-                    <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                        </svg>
-                        새로운 레시피 추천
-                    </div>
+                <!-- Chat History Container -->
+                <div id="chat-history-container" class="space-y-2">
+                    <!-- Chat history items will be dynamically added here -->
                 </div>
             </div>
 
             <!-- Sidebar bottom menu -->
             <div class="border-t border-gray-700 pt-4 space-y-2">
-                <!-- Removed Markdown Demo Button -->
                 <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -240,8 +222,18 @@
             <!-- Supple AI title (always centered) -->
             <h1 class="text-2xl font-bold text-gray-100 flex-grow text-center">Supple AI</h1>
 
-            <!-- Placeholder for right margin -->
-            <div class="w-6 h-6"></div>
+            <!-- Login/Account Info -->
+            <div class="flex items-center flex-shrink-0">
+                <button id="login-button" class="px-4 py-2 text-sm font-medium text-gray-100 bg-[#303030] rounded-lg hover:bg-[#212121] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                    로그인
+                </button>
+                <div id="account-info" class="hidden flex items-center space-x-2">
+                    <span class="text-gray-100 text-sm whitespace-nowrap">안녕하세요, <span id="user-name"></span>님!</span>
+                    <button id="logout-button" class="px-3 py-1 text-xs font-medium text-red-300 bg-[#303030] rounded-lg hover:bg-[#212121] focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
         </header>
 
         <!-- Chat message area - this will be the scrollable area for actual chat messages -->
@@ -320,9 +312,28 @@
             const sendIcon = document.getElementById('send-icon');
             const stopIcon = document.getElementById('stop-icon');
 
+            // New elements for login/account info
+            const loginButton = document.getElementById('login-button');
+            const accountInfo = document.getElementById('account-info');
+            const userNameSpan = document.getElementById('user-name');
+            const logoutButton = document.getElementById('logout-button');
+
+            // Sidebar elements for enabling/disabling based on login status
+            const newChatButton = document.getElementById('new-chat-button');
+            const chatHistoryContainer = document.getElementById('chat-history-container');
+
+
             let isSidebarOpen = window.innerWidth >= 768;
-            let chatHistory = [];
+            let chatHistory = []; // Current chat session history
             let fullAiResponseMarkdown = ''; // Accumulate the full AI response in Markdown here for chatHistory
+
+            // Chat sessions stored in localStorage
+            let chatSessions = JSON.parse(localStorage.getItem('chatSessions')) || [];
+            let currentChatSessionId = localStorage.getItem('currentChatSessionId') || null;
+
+            // Check login status from localStorage
+            let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            let currentUser = localStorage.getItem('currentUser') || '게스트'; // Default user name
 
             // Function to update sidebar visibility and greeting position
             function updateVisibilityAndPosition() {
@@ -380,6 +391,133 @@
                 }
             }
 
+            // Function to render chat history in the sidebar
+            function renderChatHistory() {
+                chatHistoryContainer.innerHTML = ''; // Clear existing history
+                if (isLoggedIn && chatSessions.length > 0) {
+                    chatSessions.forEach(session => {
+                        const chatItem = document.createElement('div');
+                        chatItem.classList.add('flex', 'items-center', 'px-3', 'py-2', 'text-sm', 'rounded-lg', 'hover:bg-[#212121]', 'cursor-pointer', 'transition', 'duration-200', 'ease-in-out');
+                        if (session.id === currentChatSessionId) {
+                            chatItem.classList.add('bg-[#212121]'); // Highlight active chat
+                        }
+                        chatItem.dataset.sessionId = session.id;
+                        chatItem.innerHTML = `
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                            </svg>
+                            <span class="truncate">${session.title}</span>
+                        `;
+                        chatItem.addEventListener('click', () => loadChatSession(session.id));
+                        chatHistoryContainer.appendChild(chatItem);
+                    });
+                }
+            }
+
+            // Function to add a new chat session
+            function newChatSession() {
+                if (!isLoggedIn) return; // Only allow if logged in
+
+                // Clear current chat display
+                chatMessagesWrapper.innerHTML = '';
+                initialGreetingContainer.classList.remove('hidden');
+
+                const newSessionId = crypto.randomUUID();
+                const newSessionTitle = `새 채팅 ${chatSessions.length + 1}`;
+                const newSession = {
+                    id: newSessionId,
+                    title: newSessionTitle,
+                    messages: [] // Empty array for new chat messages
+                };
+                chatSessions.unshift(newSession); // Add to the beginning
+                localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+                currentChatSessionId = newSessionId;
+                localStorage.setItem('currentChatSessionId', newSessionId);
+                chatHistory = []; // Reset current chat history for the new session
+                renderChatHistory(); // Re-render sidebar
+            }
+
+            // Function to load a chat session
+            function loadChatSession(sessionId) {
+                const sessionToLoad = chatSessions.find(session => session.id === sessionId);
+                if (sessionToLoad) {
+                    currentChatSessionId = sessionId;
+                    localStorage.setItem('currentChatSessionId', sessionId);
+                    chatHistory = JSON.parse(JSON.stringify(sessionToLoad.messages)); // Deep copy messages
+
+                    // Clear current chat display
+                    chatMessagesWrapper.innerHTML = '';
+                    initialGreetingContainer.classList.add('hidden'); // Hide initial greeting when a chat is loaded
+
+                    // Display loaded messages
+                    chatHistory.forEach(msg => {
+                        if (msg.role === 'user') {
+                            displayMessage('user', msg.parts[0].text);
+                        } else if (msg.role === 'model') {
+                            const aiElement = displayMessage('ai', '');
+                            aiElement.innerHTML = marked.parse(msg.parts[0].text);
+                        }
+                    });
+                    chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+                    renderChatHistory(); // Highlight active chat
+                }
+            }
+
+            // Function to save current chat session
+            function saveCurrentChatSession() {
+                if (currentChatSessionId) {
+                    const sessionIndex = chatSessions.findIndex(session => session.id === currentChatSessionId);
+                    if (sessionIndex !== -1) {
+                        chatSessions[sessionIndex].messages = JSON.parse(JSON.stringify(chatHistory)); // Deep copy
+                        // Optionally update title if the first message changes
+                        if (chatHistory.length > 0 && chatHistory[0].role === 'user') {
+                            let firstMessage = chatHistory[0].parts[0].text;
+                            if (firstMessage.length > 30) {
+                                firstMessage = firstMessage.substring(0, 27) + '...';
+                            }
+                            chatSessions[sessionIndex].title = firstMessage;
+                        }
+                        localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+                        renderChatHistory(); // Update sidebar with new title if changed
+                    }
+                }
+            }
+
+            // Function to display user login status and enable/disable features
+            function displayLoginStatus() {
+                if (isLoggedIn) {
+                    loginButton.classList.add('hidden');
+                    accountInfo.classList.remove('hidden');
+                    userNameSpan.textContent = currentUser;
+                    // Enable sidebar features
+                    newChatButton.classList.remove('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                    chatHistoryContainer.classList.remove('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                    renderChatHistory(); // Render history if logged in
+                } else {
+                    loginButton.classList.remove('hidden');
+                    accountInfo.classList.add('hidden');
+                    // Disable sidebar features
+                    newChatButton.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                    chatHistoryContainer.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                    chatHistoryContainer.innerHTML = ''; // Clear history when logged out
+                }
+            }
+
+            // Function to simulate logout (now actual logout)
+            function handleLogout() {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('chatSessions'); // Clear chat sessions on logout
+                localStorage.removeItem('currentChatSessionId'); // Clear current session
+                isLoggedIn = false;
+                currentUser = '게스트';
+                chatSessions = []; // Reset in-memory sessions
+                currentChatSessionId = null;
+                chatHistory = []; // Clear current chat history
+                displayLoginStatus();
+                window.location.reload(); // Reload to clear chat and reflect logout state
+            }
+
             // Function to display messages in the chat area
             function displayMessage(sender, message) {
                 const messageElement = document.createElement('div');
@@ -398,12 +536,12 @@
                     // AI message container for real-time markdown rendering
                     const aiResponseContainer = document.createElement('div');
                     aiResponseContainer.classList.add('max-w-xl', 'break-words', 'markdown-content');
-                    aiResponseContainer.id = 'ai-response-text';
+                    // Give it a unique ID if needed for specific updates, otherwise just append
                     messageElement.appendChild(aiResponseContainer);
                 }
                 chatMessagesWrapper.appendChild(messageElement);
                 chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
-                return messageElement.querySelector('#ai-response-text'); // Return the container element for streaming updates
+                return messageElement.querySelector('.markdown-content'); // Return the container element for streaming updates
             }
 
             // Function to show a loading indicator
@@ -567,6 +705,7 @@
 
                     // Add the full, original Markdown response to chat history
                     chatHistory.push({ role: "model", parts: [{ text: fullAiResponseMarkdown }] });
+                    saveCurrentChatSession(); // Save chat history after AI response
 
                 } catch (error) {
                     removeLoadingIndicator();
@@ -615,6 +754,18 @@
                 }
             });
 
+            // Event listener for login button: redirect to auth.html
+            loginButton.addEventListener('click', () => {
+                window.location.href = 'auth.html';
+            });
+
+            // Event listener for logout button
+            logoutButton.addEventListener('click', handleLogout);
+
+            // Event listener for New Chat button
+            newChatButton.addEventListener('click', newChatSession);
+
+
             // Adjust sidebar state and greeting position on window resize
             let resizeTimeout;
             window.addEventListener('resize', () => {
@@ -625,14 +776,23 @@
                 }, 100);
             });
 
-            // Initial sidebar visibility and greeting position update on page load
+            // Initial setup on page load
             updateVisibilityAndPosition();
+            displayLoginStatus(); // Display initial login status
+
+            // Load the current chat session if one exists
+            if (currentChatSessionId) {
+                loadChatSession(currentChatSessionId);
+            } else if (isLoggedIn) {
+                // If logged in but no current session, start a new one
+                newChatSession();
+            }
 
             // Textarea auto-height adjustment with max 3 lines and scrollbar
             userInputTextarea.addEventListener('input', function() {
                 this.style.height = 'auto';
                 const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
-                const maxHeight = 48 + lineHeight;
+                const maxHeight = 48 + parseFloat(window.getComputedStyle(this).paddingTop) + parseFloat(window.getComputedStyle(this).paddingBottom) + (parseFloat(window.getComputedStyle(this).lineHeight) * 2); // 3 lines total
 
                 const currentScrollHeight = this.scrollHeight;
 
