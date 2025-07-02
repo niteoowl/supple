@@ -6,6 +6,8 @@
     <title>Supple AI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
     <style>
         /* Inter font settings */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -19,7 +21,47 @@
         textarea {
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
+            /* Add transition for smooth height change */
+            transition: height 0.2s ease-out;
+            overflow-y: hidden; /* Hide scrollbar by default */
         }
+        /* Basic styling for markdown elements */
+        .markdown-body h1 { font-size: 2em; margin-top: 0.67em; margin-bottom: 0.67em; font-weight: bold; }
+        .markdown-body h2 { font-size: 1.5em; margin-top: 0.83em; margin-bottom: 0.83em; font-weight: bold; }
+        .markdown-body h3 { font-size: 1.17em; margin-top: 1em; margin-bottom: 1em; font-weight: bold; }
+        .markdown-body p { margin-bottom: 1em; }
+        .markdown-body ul { list-style-type: disc; margin-left: 20px; margin-bottom: 1em; }
+        .markdown-body ol { list-style-type: decimal; margin-left: 20px; margin-bottom: 1em; }
+        .markdown-body li { margin-bottom: 0.5em; }
+        .markdown-body pre {
+            background-color: #2d2d2d; /* Dark background for code blocks */
+            color: #f8f8f2; /* Light text color */
+            padding: 1em;
+            border-radius: 0.5em;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        .markdown-body code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font for code */
+            background-color: #3f3f3f; /* Slightly lighter background for inline code */
+            padding: 0.2em 0.4em;
+            border-radius: 0.3em;
+            color: #e06c75; /* Code text color */
+        }
+        .markdown-body blockquote {
+            border-left: 4px solid #555;
+            margin-left: 0;
+            padding-left: 1em;
+            color: #aaa;
+            font-style: italic;
+            margin-bottom: 1em;
+        }
+        .markdown-body a {
+            color: #61afef; /* Link color */
+            text-decoration: underline;
+        }
+        .markdown-body strong { font-weight: bold; }
+        .markdown-body em { font-style: italic; }
     </style>
 </head>
 <body class="flex h-screen bg-[#212121] text-gray-100">
@@ -100,7 +142,7 @@
     <!-- Main content area -->
     <div class="flex flex-col flex-1">
         <!-- Header -->
-        <header class="flex items-center justify-between p-4 bg-[#212121] border-b border-gray-700 shadow-md">
+        <header class="flex items-center justify-between p-4 bg-[#212121] border-b border-gray-700 shadow-md h-16">
             <!-- Mobile hamburger button (hidden on md and larger screens) -->
             <button id="mobile-hamburger-button" class="md:hidden p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -122,18 +164,16 @@
             <div class="w-6 h-6"></div>
         </header>
 
-        <!-- Chat message area -->
-        <main class="flex-1 overflow-y-auto p-6 flex items-center justify-center">
-            <div class="text-center text-gray-500">
-                <!-- Replaced icon with "Hello." text -->
-                <div class="text-5xl font-bold text-gray-400 mb-4">Hello.</div>
-                <p class="text-lg">무엇을 도와드릴까요?</p>
+        <!-- Chat message area - this will be the scrollable area for actual chat messages -->
+        <main id="chat-messages-area" class="flex-1 overflow-y-auto p-6 relative z-0">
+            <!-- Wrap chat messages in a div to control its width and center it -->
+            <div class="max-w-3xl mx-auto w-full">
+                <!-- Future chat messages will be appended here -->
             </div>
         </main>
 
         <!-- Input container -->
-        <div class="p-4 bg-[#212121] flex items-end justify-center">
-            <!-- Removed border-gray-600 from here -->
+        <div class="p-4 bg-[#212121] flex items-end justify-center h-[160px]">
             <div class="relative flex items-start max-w-3xl w-full bg-[#303030] rounded-3xl px-4 pt-4 pb-16">
                 <!-- Left elements: Plus icon and Hash icon moved to bottom-left, increased size and added circular background -->
                 <div class="absolute left-4 bottom-4 flex items-center space-x-2 flex-shrink-0">
@@ -152,25 +192,34 @@
                 </div>
 
                 <textarea
-                    class="flex-1 bg-transparent text-gray-100 resize-none focus:outline-none overflow-hidden pr-12 pl-1"
+                    id="user-input-textarea"
+                    class="flex-1 bg-transparent text-gray-100 resize-none focus:outline-none pr-12 pl-1"
                     rows="1"
                     placeholder="무엇이든 물어보세요"
                     style="min-height: 48px;"
                     oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
                 ></textarea>
 
-                <!-- Red upload button moved inside, size and y-coordinate aligned -->
-                <button class="absolute right-4 bottom-4 p-2 bg-red-600 hover:bg-red-700 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <!-- Send button changed to white background and dark icon -->
+                <button id="send-button" class="absolute right-4 bottom-4 p-2 bg-white hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition duration-200 ease-in-out">
+                    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
                     </svg>
                 </button>
             </div>
         </div>
         <!-- Disclaimer text moved to the very bottom -->
-        <p class="text-center text-xs text-gray-500 mb-4">
+        <p class="text-center text-xs text-gray-500 mb-4 h-[20px]">
             Supple AI는 오류가 발생할 수 있습니다. 중요한 정보는 확인해 주세요.
         </p>
+    </div>
+
+    <!-- Fixed "Hello" message container -->
+    <div id="initial-greeting-container" class="fixed right-0 flex items-center justify-center pointer-events-none z-10">
+        <div class="text-center text-gray-100">
+            <div class="text-5xl font-bold mb-4">Hello.</div>
+            <p class="text-lg">무엇을 도와드릴까요?</p>
+        </div>
     </div>
 
     <script>
@@ -179,15 +228,32 @@
             const desktopSidebarToggleButton = document.getElementById('desktop-sidebar-toggle-button');
             const sidebar = document.getElementById('sidebar');
             const closeSidebarButton = document.getElementById('close-sidebar-button');
-            const sidebarInnerContent = document.getElementById('sidebar-inner-content'); // Sidebar inner content div
+            const sidebarInnerContent = document.getElementById('sidebar-inner-content');
+            const initialGreetingContainer = document.getElementById('initial-greeting-container');
+            const chatMessagesArea = document.getElementById('chat-messages-area');
+            const chatMessagesWrapper = chatMessagesArea.querySelector('div');
+            const userInputTextarea = document.getElementById('user-input-textarea');
+            const sendButton = document.getElementById('send-button');
 
-            // isSidebarOpen indicates whether the sidebar should be open in the current viewport.
-            let isSidebarOpen = window.innerWidth >= 768; // Open by default on desktop, closed on mobile
+            let isSidebarOpen = window.innerWidth >= 768;
+            let chatHistory = [];
 
-            // Function to update sidebar visibility
-            function updateSidebarVisibility() {
-                if (window.innerWidth >= 768) { // Desktop view
-                    // Remove mobile-specific classes and show desktop button
+            // Function to update sidebar visibility and greeting position
+            function updateVisibilityAndPosition() {
+                const header = document.querySelector('header');
+                const inputContainer = document.querySelector('.p-4.bg-\\[\\#212121\\].flex.items-end.justify-center.h-\\[160px\\]');
+                const disclaimer = document.querySelector('.text-center.text-xs.text-gray-500.mb-4.h-\\[20px\\]');
+
+                const headerHeight = header ? header.offsetHeight : 0;
+                const inputContainerHeight = inputContainer ? inputContainer.offsetHeight : 0;
+                const disclaimerHeight = disclaimer ? disclaimer.offsetHeight : 0;
+
+                const totalBottomHeight = inputContainerHeight + disclaimerHeight;
+
+                initialGreetingContainer.style.top = headerHeight + 'px';
+                initialGreetingContainer.style.bottom = totalBottomHeight + 'px';
+
+                if (window.innerWidth >= 768) {
                     sidebar.classList.remove('absolute', 'inset-y-0', 'left-0', 'z-50', 'hidden');
                     closeSidebarButton.classList.add('hidden');
                     mobileHamburgerButton.classList.add('hidden');
@@ -195,28 +261,30 @@
 
                     if (isSidebarOpen) {
                         sidebar.classList.remove('w-0');
-                        sidebar.classList.add('w-72'); // Apply increased width
+                        sidebar.classList.add('w-72');
                         sidebarInnerContent.classList.remove('opacity-0', 'pointer-events-none');
                         sidebarInnerContent.classList.add('opacity-100', 'pointer-events-auto');
+                        initialGreetingContainer.style.left = '18rem';
                     } else {
                         sidebar.classList.remove('w-72');
                         sidebar.classList.add('w-0');
-                        sidebarInnerContent.classList.remove('opacity-100', 'pointer-events-auto');
+                        sidebarInnerContent.classList.remove('opacity-100', 'pointer-events-none');
                         sidebarInnerContent.classList.add('opacity-0', 'pointer-events-none');
+                        initialGreetingContainer.style.left = '0';
                     }
-                } else { // Mobile view
-                    // Remove desktop-specific classes and show mobile button
+                } else {
                     sidebar.classList.remove('w-72', 'w-0');
                     desktopSidebarToggleButton.classList.add('hidden');
                     mobileHamburgerButton.classList.remove('hidden');
+                    initialGreetingContainer.style.left = '0';
 
-                    if (isSidebarOpen) { // If isSidebarOpen is true, mobile sidebar should be open
+                    if (isSidebarOpen) {
                         sidebar.classList.remove('hidden');
-                        sidebar.classList.add('absolute', 'inset-y-0', 'left-0', 'z-50', 'w-72'); // Apply increased width
+                        sidebar.classList.add('absolute', 'inset-y-0', 'left-0', 'z-50', 'w-72');
                         closeSidebarButton.classList.remove('hidden');
                         sidebarInnerContent.classList.remove('opacity-0', 'pointer-events-none');
                         sidebarInnerContent.classList.add('opacity-100', 'pointer-events-auto');
-                    } else { // If isSidebarOpen is false, mobile sidebar should be closed
+                    } else {
                         sidebar.classList.remove('absolute', 'inset-y-0', 'left-0', 'z-50', 'w-72');
                         sidebar.classList.add('hidden');
                         closeSidebarButton.classList.add('hidden');
@@ -226,55 +294,245 @@
                 }
             }
 
+            // Function to display messages in the chat area
+            function displayMessage(sender, message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('flex', 'mb-4');
+
+                if (sender === 'user') {
+                    messageElement.classList.add('justify-end');
+                    // User message in a styled box
+                    messageElement.innerHTML = `
+                        <div class="bg-[#303030] text-white p-3 rounded-lg max-w-xl shadow-md break-words">
+                            ${message}
+                        </div>
+                    `;
+                } else { // sender === 'ai'
+                    messageElement.classList.add('justify-start');
+                    // AI message container. This will be updated with parsed markdown.
+                    messageElement.innerHTML = `
+                        <div class="max-w-xl break-words markdown-body" id="ai-response-container">
+                            <!-- Parsed markdown content will be rendered here -->
+                        </div>
+                    `;
+                }
+                chatMessagesWrapper.appendChild(messageElement);
+                chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+                return messageElement.querySelector('#ai-response-container'); // Return the container element for updating
+            }
+
+            // Function to show a loading indicator
+            function showLoadingIndicator() {
+                const loadingElement = document.createElement('div');
+                loadingElement.id = 'loading-indicator';
+                loadingElement.classList.add('flex', 'justify-start', 'mb-4');
+                loadingElement.innerHTML = `
+                    <div class="bg-[#303030] text-gray-100 p-3 rounded-lg max-w-xl shadow-md flex items-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        응답 중...
+                    </div>
+                `;
+                chatMessagesWrapper.appendChild(loadingElement);
+                chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+            }
+
+            // Function to remove the loading indicator
+            function removeLoadingIndicator() {
+                const loadingElement = document.getElementById('loading-indicator');
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+            }
+
+            // Function to send message to Gemini API
+            async function sendMessage() {
+                const prompt = userInputTextarea.value.trim();
+                if (prompt === '') {
+                    return;
+                }
+
+                initialGreetingContainer.classList.add('hidden');
+
+                displayMessage('user', prompt);
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                userInputTextarea.value = '';
+                userInputTextarea.style.height = '48px';
+
+                showLoadingIndicator();
+
+                let accumulatedText = ''; // Accumulate the full AI response here
+                let aiResponseContainerElement = null; // This will be the div to which markdown is rendered
+                let loadingRemoved = false; // Flag to ensure loading indicator is removed only once
+
+                let buffer = ''; // Buffer to hold incomplete lines
+
+                try {
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.body) {
+                        throw new Error('응답 본문이 없습니다.');
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder('utf-8');
+                    let done = false;
+
+                    while (!done) {
+                        const { value, done: readerDone } = await reader.read();
+                        done = readerDone;
+                        const chunk = decoder.decode(value, { stream: true });
+                        console.log('Received raw chunk:', chunk); // Log the raw chunk
+
+                        buffer += chunk;
+
+                        // Split buffer by newline and process each line
+                        const lines = buffer.split('\n');
+                        // Keep the last part in buffer if it's not a complete line
+                        buffer = lines.pop();
+
+                        for (let line of lines) {
+                            line = line.trim(); // Trim each line
+
+                            if (line) {
+                                // Use regex to remove "data: " prefix, handling any leading/trailing whitespace around it
+                                line = line.replace(/^\s*data:\s*/, '').trim();
+
+                                try {
+                                    const json = JSON.parse(line);
+                                    if (json.candidates && json.candidates.length > 0 &&
+                                        json.candidates[0].content && json.candidates[0].content.parts &&
+                                        json.candidates[0].content.parts.length > 0) {
+                                        const textPart = json.candidates[0].content.parts[0].text;
+                                        console.log('Parsed textPart:', textPart); // Log the parsed textPart
+
+                                        if (!loadingRemoved) {
+                                            removeLoadingIndicator(); // Remove loading indicator on first chunk
+                                            aiResponseContainerElement = displayMessage('ai', ''); // Display an empty message initially
+                                            loadingRemoved = true;
+                                        }
+
+                                        accumulatedText += textPart; // Accumulate the text
+                                        // 텍스트 조각이 도착할 때마다 즉시 전체 누적 텍스트를 파싱하여 렌더링
+                                        aiResponseContainerElement.innerHTML = marked.parse(accumulatedText);
+                                        chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+                                    }
+                                } catch (e) {
+                                    console.error('JSON 파싱 오류 또는 불완전한 JSON:', e, `"${line}"`);
+                                }
+                            }
+                        }
+                    }
+                    // Process any remaining content in the buffer after the loop
+                    if (buffer.trim()) {
+                        let finalLine = buffer.trim().replace(/^\s*data:\s*/, '').trim();
+                         try {
+                            const json = JSON.parse(finalLine);
+                            if (json.candidates && json.candidates.length > 0 &&
+                                json.candidates[0].content && json.candidates[0].content.parts &&
+                                json.candidates[0].content.parts.length > 0) {
+                                const textPart = json.candidates[0].content.parts[0].text;
+                                console.log('Final buffer textPart:', textPart); // Log the final buffer textPart
+                                if (!loadingRemoved) { // In case the very first chunk is in the final buffer
+                                    removeLoadingIndicator();
+                                    aiResponseContainerElement = displayMessage('ai', '');
+                                    loadingRemoved = true;
+                                }
+                                accumulatedText += textPart; // Accumulate for chat history
+                                aiResponseContainerElement.innerHTML = marked.parse(accumulatedText);
+                                chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+                            }
+                        } catch (e) {
+                            console.error('Final buffer JSON 파싱 오류:', e, `"${finalLine}"`);
+                        }
+                    }
+
+                    // The accumulatedText now contains the complete AI response
+                    chatHistory.push({ role: "model", parts: [{ text: accumulatedText }] });
+
+                } catch (error) {
+                    removeLoadingIndicator();
+                    displayMessage('ai', '메시지를 보내는 중 오류가 발생했습니다. 다시 시도해주세요.');
+                    console.error('API 호출 오류:', error);
+                }
+            }
+
+            // Event listeners for sending messages
+            sendButton.addEventListener('click', sendMessage);
+            userInputTextarea.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+
             // Event listener for mobile hamburger button click
             mobileHamburgerButton.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevents the click from bubbling up to the document and immediately closing the sidebar
-                isSidebarOpen = true; // Mobile hamburger button always opens the sidebar.
-                updateSidebarVisibility();
+                event.stopPropagation();
+                isSidebarOpen = !isSidebarOpen;
+                updateVisibilityAndPosition();
             });
 
             // Event listener for desktop sidebar toggle button click
             desktopSidebarToggleButton.addEventListener('click', () => {
-                isSidebarOpen = !isSidebarOpen; // Desktop toggle button switches the state.
-                updateSidebarVisibility();
+                isSidebarOpen = !isSidebarOpen;
+                updateVisibilityAndPosition();
             });
 
             // Event listener for mobile sidebar close button click
             closeSidebarButton.addEventListener('click', () => {
-                isSidebarOpen = false; // Mobile close button always closes the sidebar.
-                updateSidebarVisibility();
+                isSidebarOpen = false;
+                updateVisibilityAndPosition();
             });
 
             // Handle clicks outside the sidebar on mobile to close it
             document.addEventListener('click', (event) => {
-                // If current screen width is less than md (768px) and sidebar is visible
                 if (window.innerWidth < 768 && isSidebarOpen) {
-                    // If the clicked element is not inside the sidebar and not the hamburger button
                     if (!sidebar.contains(event.target) && !mobileHamburgerButton.contains(event.target)) {
                         isSidebarOpen = false;
-                        updateSidebarVisibility();
+                        updateVisibilityAndPosition();
                     }
                 }
             });
 
-            // Adjust sidebar state on window resize
+            // Adjust sidebar state and greeting position on window resize
             let resizeTimeout;
             window.addEventListener('resize', () => {
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
-                    // Reset isSidebarOpen to default based on new viewport width on resize
-                    isSidebarOpen = window.innerWidth >= 768; // Open if desktop, closed if mobile
-                    updateSidebarVisibility();
-                }, 100); // Debounce resize event
+                    isSidebarOpen = window.innerWidth >= 768;
+                    updateVisibilityAndPosition();
+                }, 100);
             });
 
-            // Initial sidebar visibility update on page load
-            updateSidebarVisibility();
+            // Initial sidebar visibility and greeting position update on page load
+            updateVisibilityAndPosition();
 
-            // Textarea auto-height adjustment
-            document.querySelector('textarea').addEventListener('input', function() {
+            // Textarea auto-height adjustment with max 3 lines and scrollbar
+            userInputTextarea.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
+                const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
+                const maxHeight = 48 + lineHeight;
+
+                const currentScrollHeight = this.scrollHeight;
+
+                if (currentScrollHeight > maxHeight) {
+                    this.style.height = maxHeight + 'px';
+                    this.style.overflowY = 'auto';
+                } else {
+                    this.style.height = currentScrollHeight + 'px';
+                    this.style.overflowY = 'hidden';
+                }
             });
         });
     </script>
