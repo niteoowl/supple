@@ -49,38 +49,97 @@
         .markdown-content tr:nth-child(even) {
             background-color: #252525; /* Alternate row background */
         }
-        .markdown-content p {
-            margin-bottom: 0.5rem; /* Add some spacing between paragraphs */
-        }
-        .markdown-content ul,
-        .markdown-content ol {
-            margin-left: 1.5rem; /* Indent lists */
-            list-style-position: outside;
+        /* Markdown content specific styles based on user's request */
+        .markdown-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
+            color: #e0e0e0; /* Ensure visibility against dark background */
+        }
+        .markdown-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+        }
+        .markdown-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+        }
+        .markdown-content h4 {
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+        }
+        .markdown-content h5 {
+            font-size: 0.83em;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+        }
+        .markdown-content h6 {
+            font-size: 0.67em;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+        }
+        .markdown-content p {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        .markdown-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-content ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
         }
         .markdown-content li {
             margin-bottom: 0.25rem;
         }
-        .markdown-content code {
-            background-color: #3a3a3a;
-            padding: 0.2em 0.4em;
-            border-radius: 0.3em;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            font-size: 0.9em;
+        .markdown-content strong {
+            font-weight: 700;
         }
-        .markdown-content pre {
-            background-color: #1a1a1a;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto; /* Enable horizontal scrolling for long code lines */
-            margin-top: 1rem;
-            margin-bottom: 1rem;
+        .markdown-content em {
+            font-style: italic;
+        }
+        .markdown-content a {
+            color: #3b82f6; /* Tailwind blue-500 */
+            text-decoration: underline;
+        }
+        .markdown-content blockquote {
+            border-left: 4px solid #ccc;
+            padding-left: 1rem;
+            color: #666; /* User's suggested color */
+            margin: 1rem 0;
+        }
+        .markdown-content code {
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+            padding: 0.2em 0.4em;
+            font-size: 0.875em;
+            border-radius: 0.25rem;
+            font-family: 'Fira Code', monospace; /* User's suggested font */
+            color: #333; /* Ensure code text is visible */
         }
         .markdown-content pre code {
-            background-color: transparent;
-            padding: 0;
-            border-radius: 0;
-            font-size: 1em;
+            display: block;
+            background-color: #1f2937; /* Tailwind gray-800 */
+            color: #f8fafc; /* Tailwind gray-100 */
+            padding: 1rem;
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
         }
     </style>
 </head>
@@ -131,6 +190,7 @@
 
             <!-- Sidebar bottom menu -->
             <div class="border-t border-gray-700 pt-4 space-y-2">
+                <!-- Removed Markdown Demo Button -->
                 <div class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-[#212121] cursor-pointer transition duration-200 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -222,8 +282,11 @@
 
                 <!-- Send button changed to white background and dark icon -->
                 <button id="send-button" class="absolute right-4 bottom-4 p-2 bg-white hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition duration-200 ease-in-out">
-                    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="send-icon" class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                    <svg id="stop-icon" class="w-6 h-6 text-gray-800 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
                     </svg>
                 </button>
             </div>
@@ -254,6 +317,8 @@
             const chatMessagesWrapper = chatMessagesArea.querySelector('div');
             const userInputTextarea = document.getElementById('user-input-textarea');
             const sendButton = document.getElementById('send-button');
+            const sendIcon = document.getElementById('send-icon');
+            const stopIcon = document.getElementById('stop-icon');
 
             let isSidebarOpen = window.innerWidth >= 768;
             let chatHistory = [];
@@ -367,20 +432,71 @@
                 }
             }
 
-            // Function to render markdown chunks directly
-            function renderMarkdownChunk(containerElement, textChunk) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = marked.parse(textChunk); // Apply markdown conversion
-
-                // Append each line/block separately
-                for (const child of Array.from(tempDiv.children)) {
-                    const messageLine = document.createElement('div');
-                    messageLine.className = 'mb-1'; // Add margin bottom for spacing between lines/blocks
-                    messageLine.innerHTML = child.outerHTML;
-
-                    containerElement.appendChild(messageLine);
-                    chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+            // Function to toggle send/stop button state
+            function toggleSendButton(isSending) {
+                if (isSending) {
+                    sendButton.disabled = true;
+                    // Keep send button's white background and hover state
+                    sendIcon.classList.add('hidden');
+                    stopIcon.classList.remove('hidden');
+                    // Ensure stop icon is black
+                    stopIcon.classList.remove('text-white');
+                    stopIcon.classList.add('text-gray-800');
+                } else {
+                    sendButton.disabled = false;
+                    // Keep send button's white background and hover state
+                    sendIcon.classList.remove('hidden');
+                    stopIcon.classList.add('hidden');
+                    // Ensure send icon is black
+                    sendIcon.classList.remove('text-white');
+                    sendIcon.classList.add('text-gray-800');
                 }
+            }
+
+
+            // Typewriter effect function (word by word)
+            async function typeWriterEffect(element, markdownText, initialWordDelay = 10, punctuationWordDelay = 5) { // Speed increased
+                return new Promise(resolve => {
+                    // Split text by spaces, keeping spaces as separate elements to maintain structure
+                    // This regex splits by one or more whitespace characters, capturing them
+                    const wordsAndSpaces = markdownText.match(/(\S+|\s+)/g) || [];
+                    let wordIndex = 0;
+                    let currentMarkdown = ''; // Accumulate Markdown text
+
+                    element.innerHTML = ''; // Clear existing content
+
+                    function typeNextWord() {
+                        if (wordIndex < wordsAndSpaces.length) {
+                            const chunk = wordsAndSpaces[wordIndex];
+                            currentMarkdown += chunk;
+
+                            // Real-time Markdown parsing and rendering
+                            // IMPORTANT: Directly apply marked.parse result to innerHTML
+                            element.innerHTML = marked.parse(currentMarkdown);
+
+                            chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+
+                            let delay = initialWordDelay;
+
+                            // If the current chunk (word or punctuation) ends with a sentence-ending punctuation,
+                            // or if the *previous* chunk ended with one and the current is a space,
+                            // speed up the delay for the *next* chunk.
+                            if (chunk.length > 0 && ['.', '?', '!'].includes(chunk.slice(-1))) {
+                                delay = punctuationWordDelay;
+                            } else if (wordIndex > 0 && wordsAndSpaces[wordIndex - 1].length > 0 &&
+                                       ['.', '?', '!'].includes(wordsAndSpaces[wordIndex - 1].slice(-1)) &&
+                                       chunk.trim() === '') { // If previous was punctuation and current is a space
+                                delay = punctuationWordDelay;
+                            }
+
+                            wordIndex++;
+                            setTimeout(typeNextWord, delay);
+                        } else {
+                            resolve(); // Resolve the promise when animation is complete
+                        }
+                    }
+                    typeNextWord();
+                });
             }
 
             // Function to fix spacing issues in Korean text (JavaScript equivalent of Python function)
@@ -390,19 +506,20 @@
                 // Add space between Korean and English/numbers
                 text = text.replace(/([가-힣])([A-Za-z0-9])/g, '$1 $2');
                 text = text.replace(/([A-Za-z0-9])([가-힣])/g, '$1 $2');
-                // Reduce multiple spaces to a single space
-                text = text.replace(/\s+/g, ' ');
+                // Removed the problematic line that collapsed multiple spaces,
+                // which interfered with Markdown's two-space line break syntax.
+                // text = text.replace(/\s+/g, ' ');
                 return text.trim();
             }
 
             // Function to send message to Gemini API
-            async function sendMessage() {
-                const prompt = userInputTextarea.value.trim();
+            async function sendMessage(prompt) {
                 if (prompt === '') {
                     return;
                 }
 
                 initialGreetingContainer.classList.add('hidden');
+                toggleSendButton(true); // Change to stop button and disable
 
                 displayMessage('user', prompt);
                 chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -413,12 +530,11 @@
 
                 let aiResponseElement = null;
                 fullAiResponseMarkdown = ''; // Reset full AI response for new message
-                let buffer = ''; // Buffer to hold incomplete lines
 
                 try {
                     const payload = { contents: chatHistory };
-                    const apiKey = "";
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?key=${apiKey}`;
+                    const apiKey = "AIzaSyCLXW8Sq-7EsyaYityie3avuwxAMZwYOyY"; // API 키 적용
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; // generateContent 사용
 
                     const response = await fetch(apiUrl, {
                         method: 'POST',
@@ -426,78 +542,27 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!response.body) {
-                        throw new Error('응답 본문이 없습니다.');
-                    }
+                    const result = await response.json(); // 전체 응답을 한 번에 받음
 
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder('utf-8');
-                    let done = false;
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        let rawText = result.candidates[0].content.parts[0].text; // 원본 텍스트 저장
 
-                    while (!done) {
-                        const { value, done: readerDone } = await reader.read();
-                        done = readerDone;
-                        const chunk = decoder.decode(value, { stream: true });
-                        buffer += chunk;
+                        let fixedText = fixSpacing(rawText); // 띄어쓰기 수정
 
-                        let newlineIndex;
-                        while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
-                            let line = buffer.substring(0, newlineIndex).trim();
-                            buffer = buffer.substring(newlineIndex + 1);
+                        removeLoadingIndicator(); // 응답을 받으면 로딩 인디케이터 제거
 
-                            if (line.startsWith('data:')) {
-                                const jsonString = line.substring(5).trim();
-                                try {
-                                    const json = JSON.parse(jsonString);
-                                    if (json.candidates && json.candidates.length > 0 &&
-                                        json.candidates[0].content && json.candidates[0].content.parts &&
-                                        json.candidates[0].content.parts.length > 0) {
-                                        let textPart = json.candidates[0].content.parts[0].text;
+                        aiResponseElement = displayMessage('ai', ''); // AI 메시지 컨테이너 생성
 
-                                        // Apply spacing fix to the AI's response part
-                                        textPart = fixSpacing(textPart);
+                        // 타입라이터 애니메이션 실행 (단어 단위)
+                        await typeWriterEffect(aiResponseElement, fixedText);
 
-                                        if (aiResponseElement === null) {
-                                            removeLoadingIndicator(); // Remove loading indicator on first chunk
-                                            aiResponseElement = displayMessage('ai', ''); // Display an empty message initially
-                                        }
-                                        renderMarkdownChunk(aiResponseElement, textPart); // Render markdown chunk
-                                        fullAiResponseMarkdown += textPart; // Accumulate for chat history
-                                    }
-                                } catch (e) {
-                                    console.error('JSON parsing error (after data: prefix):', e, `"${jsonString}"`);
-                                }
-                            } else if (line === '[DONE]') {
-                                // "[DONE]" message indicates end of stream, no special handling needed here.
-                            } else if (line !== '') {
-                                // Log other non-empty lines that are not 'data:' or '[DONE]'
-                                console.warn('Unexpected stream line (no data: prefix):', `"${line}"`);
-                            }
-                        }
-                    }
-
-                    // Process any remaining content in the buffer after the loop
-                    if (buffer.trim().startsWith('data:')) {
-                        const jsonString = buffer.trim().substring(5).trim();
-                        try {
-                            const json = JSON.parse(jsonString);
-                            if (json.candidates && json.candidates.length > 0 &&
-                                json.candidates[0].content && json.candidates[0].content.parts &&
-                                json.candidates[0].content.parts.length > 0) {
-                                let textPart = json.candidates[0].content.parts[0].text;
-                                textPart = fixSpacing(textPart);
-                                if (aiResponseElement === null) {
-                                    removeLoadingIndicator();
-                                    aiResponseElement = displayMessage('ai', '');
-                                }
-                                renderMarkdownChunk(aiResponseElement, textPart);
-                                fullAiResponseMarkdown += textPart;
-                            }
-                        } catch (e) {
-                            console.error('Final buffer JSON parsing error (after data: prefix):', e, `"${jsonString}"`);
-                        }
-                    } else if (buffer.trim() !== '') {
-                        console.warn('Unexpected final buffer content (no data: prefix):', `"${buffer.trim()}"`);
+                        fullAiResponseMarkdown = rawText; // 채팅 기록을 위해 원본 마크다운 누적
+                    } else {
+                        removeLoadingIndicator();
+                        displayMessage('ai', 'API 응답 형식이 예상과 다릅니다.');
+                        console.error('Unexpected API response structure:', result);
                     }
 
                     // Add the full, original Markdown response to chat history
@@ -507,15 +572,17 @@
                     removeLoadingIndicator();
                     displayMessage('ai', '메시지를 보내는 중 오류가 발생했습니다. 다시 시도해주세요.');
                     console.error('API call error:', error);
+                } finally {
+                    toggleSendButton(false); // Revert to send button and enable
                 }
             }
 
             // Event listeners for sending messages
-            sendButton.addEventListener('click', sendMessage);
+            sendButton.addEventListener('click', () => sendMessage(userInputTextarea.value.trim()));
             userInputTextarea.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
-                    sendMessage();
+                    sendMessage(userInputTextarea.value.trim());
                 }
             });
 
