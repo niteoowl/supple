@@ -9,9 +9,9 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Firestore는 현재 사용되지 않지만, 필요할 경우를 위해 포함
-        window.firebase = { initializeApp, getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getFirestore };
+        window.firebase = { initializeApp, getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, getFirestore };
     </script>
     <style>
         /* Inter 폰트를 전역적으로 적용합니다. */
@@ -84,28 +84,13 @@
     </div>
 
     <div class="w-full max-w-md p-4">
-        <h2 id="welcome-title" class="text-3xl font-bold text-center mb-8">계정 만들기</h2>
+        <h2 id="welcome-title" class="text-3xl font-bold text-center mb-8">다시 오신 걸 환영합니다</h2>
 
-        <!-- Email Input Form -->
-        <form id="email-form" class="space-y-4">
+        <!-- Login Form (Initially visible) -->
+        <form id="login-form" class="space-y-4">
             <div>
-                <input type="email" id="user-email" placeholder="이메일 주소"
+                <input type="email" id="login-email" placeholder="이메일 주소"
                        class="w-full input-field">
-            </div>
-            <button type="submit"
-                    class="w-full continue-button">
-                계속
-            </button>
-        </form>
-
-        <!-- Password Login Form (initially hidden) -->
-        <form id="password-login-form" class="space-y-4 hidden">
-            <button type="button" id="back-to-email-login" class="text-gray-500 hover:text-gray-700 text-sm mb-4 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                뒤로
-            </button>
-            <div>
-                <input type="email" id="login-email-display" class="w-full input-field bg-gray-50 text-gray-700 cursor-not-allowed" readonly>
             </div>
             <div>
                 <input type="password" id="login-password" placeholder="비밀번호"
@@ -117,14 +102,11 @@
             </button>
         </form>
 
-        <!-- Password Registration Form (initially hidden) -->
-        <form id="password-register-form" class="space-y-4 hidden">
-            <button type="button" id="back-to-email-register" class="text-gray-500 hover:text-gray-700 text-sm mb-4 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                뒤로
-            </button>
+        <!-- Registration Form (Initially hidden) -->
+        <form id="register-form" class="space-y-4 hidden">
             <div>
-                <input type="email" id="register-email-display" class="w-full input-field bg-gray-50 text-gray-700 cursor-not-allowed" readonly>
+                <input type="email" id="register-email" placeholder="이메일 주소"
+                       class="w-full input-field">
             </div>
             <div>
                 <input type="password" id="register-password" placeholder="비밀번호 (최소 6자)"
@@ -143,37 +125,32 @@
         <!-- Message Box for alerts -->
         <div id="message-box" class="hidden message-box text-center" role="alert"></div>
 
-        <!-- Toggle Link (dynamically changed by JS) -->
+        <!-- Toggle Link -->
         <p id="toggle-link-container" class="text-center text-sm text-gray-500 mt-6">
-            이미 계정이 있으신가요?
+            계정이 없으신가요?
             <button id="toggle-auth-mode-button" class="text-blue-600 hover:text-blue-800 font-medium ml-1 focus:outline-none">
-                로그인
+                회원 가입
             </button>
         </p>
     </div>
 
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            const { initializeApp, getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getFirestore } = window.firebase;
+            const { initializeApp, getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = window.firebase;
 
             const welcomeTitle = document.getElementById('welcome-title');
-            const emailForm = document.getElementById('email-form');
-            const userEmailInput = document.getElementById('user-email');
-            const passwordLoginForm = document.getElementById('password-login-form');
-            const loginEmailDisplay = document.getElementById('login-email-display');
+            const loginForm = document.getElementById('login-form');
+            const loginEmailInput = document.getElementById('login-email');
             const loginPasswordInput = document.getElementById('login-password');
-            const passwordRegisterForm = document.getElementById('password-register-form');
-            const registerEmailDisplay = document.getElementById('register-email-display');
+            const registerForm = document.getElementById('register-form');
+            const registerEmailInput = document.getElementById('register-email');
             const registerPasswordInput = document.getElementById('register-password');
             const registerConfirmPasswordInput = document.getElementById('register-confirm-password');
-            const backToEmailLoginButton = document.getElementById('back-to-email-login');
-            const backToEmailRegisterButton = document.getElementById('back-to-email-register');
-            const toggleAuthModeButton = document.getElementById('toggle-auth-mode-button'); // Renamed from signupButton
+            const toggleAuthModeButton = document.getElementById('toggle-auth-mode-button');
             const toggleLinkContainer = document.getElementById('toggle-link-container');
             const messageBox = document.getElementById('message-box');
 
-            let currentEmail = ''; // Store the email entered in the first step
-            let isCreateAccountMode = true; // Initial state: "계정 만들기"
+            let isLoginFormActive = true; // Track which form is currently active
 
             // Firebase Configuration
             const firebaseConfig = {
@@ -189,7 +166,7 @@
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
-            const db = getFirestore(app); // Firestore initialized, but not used in this auth flow directly.
+            // const db = getFirestore(app); // Firestore는 현재 사용되지 않으므로 주석 처리
 
             // Function to display messages in the message box
             function showMessage(message, type = 'info') {
@@ -201,101 +178,57 @@
                 }, 5000); // Hide after 5 seconds
             }
 
-            // Function to reset forms and show email input based on mode
-            function showEmailForm(mode) {
-                isCreateAccountMode = (mode === 'create');
+            // Function to switch between login and registration forms
+            function switchForm(toLogin) {
+                isLoginFormActive = toLogin;
+                messageBox.classList.add('hidden'); // Hide messages on form switch
 
-                emailForm.classList.remove('hidden');
-                passwordLoginForm.classList.add('hidden');
-                passwordRegisterForm.classList.add('hidden');
-                toggleLinkContainer.classList.remove('hidden');
-
-                userEmailInput.value = ''; // Clear email input
-                loginPasswordInput.value = ''; // Clear password inputs
-                registerPasswordInput.value = '';
-                registerConfirmPasswordInput.value = '';
-                messageBox.classList.add('hidden'); // Hide any previous messages
-
-                if (isCreateAccountMode) {
-                    welcomeTitle.textContent = '계정 만들기';
-                    toggleLinkContainer.innerHTML = `
-                        이미 계정이 있으신가요?
-                        <button id="toggle-auth-mode-button" class="text-blue-600 hover:text-blue-800 font-medium ml-1 focus:outline-none">
-                            로그인
-                        </button>
-                    `;
-                } else {
+                if (isLoginFormActive) {
                     welcomeTitle.textContent = '다시 오신 걸 환영합니다';
+                    loginForm.classList.remove('hidden');
+                    registerForm.classList.add('hidden');
                     toggleLinkContainer.innerHTML = `
                         계정이 없으신가요?
                         <button id="toggle-auth-mode-button" class="text-blue-600 hover:text-blue-800 font-medium ml-1 focus:outline-none">
                             회원 가입
                         </button>
                     `;
+                    loginEmailInput.focus();
+                } else {
+                    welcomeTitle.textContent = '계정 만들기';
+                    loginForm.classList.add('hidden');
+                    registerForm.classList.remove('hidden');
+                    toggleLinkContainer.innerHTML = `
+                        이미 계정이 있으신가요?
+                        <button id="toggle-auth-mode-button" class="text-blue-600 hover:text-blue-800 font-medium ml-1 focus:outline-none">
+                            로그인
+                        </button>
+                    `;
+                    registerEmailInput.focus();
                 }
                 // Re-attach event listener for the dynamically created button
                 document.getElementById('toggle-auth-mode-button').addEventListener('click', () => {
-                    showEmailForm(isCreateAccountMode ? 'login' : 'create');
+                    switchForm(!isLoginFormActive);
                 });
             }
 
-            // Handle Email Form Submission
-            emailForm.addEventListener('submit', async (e) => {
+            // Handle Login Form Submission
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                currentEmail = userEmailInput.value.trim();
-
-                if (!currentEmail) {
-                    showMessage('이메일 주소를 입력해주세요.', 'error');
-                    return;
-                }
-
-                showMessage('이메일 확인 중...', 'info');
-
-                try {
-                    const signInMethods = await fetchSignInMethodsForEmail(auth, currentEmail);
-
-                    emailForm.classList.add('hidden'); // Hide email form
-                    toggleLinkContainer.classList.add('hidden'); // Hide toggle link
-
-                    if (signInMethods && signInMethods.length > 0) {
-                        // Email exists, show login form
-                        welcomeTitle.textContent = '비밀번호를 입력하세요';
-                        loginEmailDisplay.value = currentEmail;
-                        passwordLoginForm.classList.remove('hidden');
-                        loginPasswordInput.focus();
-                        showMessage('로그인을 위해 비밀번호를 입력해주세요.', 'info');
-                    } else {
-                        // Email does not exist, show registration form
-                        welcomeTitle.textContent = '회원가입';
-                        registerEmailDisplay.value = currentEmail;
-                        passwordRegisterForm.classList.remove('hidden');
-                        registerPasswordInput.focus();
-                        showMessage('새로운 계정을 생성합니다. 비밀번호를 설정해주세요.', 'info');
-                    }
-                } catch (error) {
-                    console.error('Email check error:', error);
-                    let errorMessage = '이메일 확인 중 오류가 발생했습니다. 다시 시도해주세요.';
-                    showMessage(errorMessage, 'error');
-                    showEmailForm(isCreateAccountMode ? 'create' : 'login'); // Go back to current mode's email form on error
-                }
-            });
-
-            // Handle Password Login Form Submission
-            passwordLoginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
+                const email = loginEmailInput.value.trim();
                 const password = loginPasswordInput.value;
 
-                if (!password) {
-                    showMessage('비밀번호를 입력해주세요.', 'error');
+                if (!email || !password) {
+                    showMessage('이메일과 비밀번호를 모두 입력해주세요.', 'error');
                     return;
                 }
 
                 showMessage('로그인 중...', 'info');
 
                 try {
-                    await signInWithEmailAndPassword(auth, currentEmail, password);
+                    await signInWithEmailAndPassword(auth, email, password);
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('currentUser', currentEmail.split('@')[0]); // Use part of email as user name
+                    localStorage.setItem('currentUser', email.split('@')[0]); // Use part of email as user name
                     showMessage('로그인 성공!', 'success');
                     window.location.href = 'index.html'; // Redirect to main app
                 } catch (error) {
@@ -307,19 +240,26 @@
                         errorMessage = '사용자를 찾을 수 없습니다.';
                     } else if (error.code === 'auth/invalid-credential') {
                         errorMessage = '잘못된 자격 증명입니다. 이메일 또는 비밀번호를 확인해주세요.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = '유효하지 않은 이메일 주소입니다.';
+                    } else if (error.code === 'auth/user-disabled') {
+                        errorMessage = '이 계정은 비활성화되었습니다.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = '로그인 시도 횟수가 너무 많습니다. 잠시 후 다시 시도해주세요.';
                     }
                     showMessage(errorMessage, 'error');
                 }
             });
 
-            // Handle Password Registration Form Submission
-            passwordRegisterForm.addEventListener('submit', async (e) => {
+            // Handle Registration Form Submission
+            registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const email = registerEmailInput.value.trim();
                 const password = registerPasswordInput.value;
                 const confirmPassword = registerConfirmPasswordInput.value;
 
-                if (!password || !confirmPassword) {
-                    showMessage('비밀번호와 비밀번호 확인을 모두 입력해주세요.', 'error');
+                if (!email || !password || !confirmPassword) {
+                    showMessage('모든 필드를 채워주세요.', 'error');
                     return;
                 }
                 if (password.length < 6) {
@@ -334,9 +274,9 @@
                 showMessage('회원가입 중...', 'info');
 
                 try {
-                    await createUserWithEmailAndPassword(auth, currentEmail, password);
+                    await createUserWithEmailAndPassword(auth, email, password);
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('currentUser', currentEmail.split('@')[0]); // Use part of email as user name
+                    localStorage.setItem('currentUser', email.split('@')[0]); // Use part of email as user name
                     showMessage('회원가입 성공!', 'success');
                     window.location.href = 'index.html'; // Redirect to main app
                 } catch (error) {
@@ -353,12 +293,8 @@
                 }
             });
 
-            // Back button handlers
-            backToEmailLoginButton.addEventListener('click', () => showEmailForm('login'));
-            backToEmailRegisterButton.addEventListener('click', () => showEmailForm('create'));
-
-            // Initial state: ensure email form is visible in 'create' mode to match the image
-            showEmailForm('create');
+            // Initial state: show login form by default
+            switchForm(true);
         });
     </script>
 </body>
