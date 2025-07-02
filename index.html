@@ -204,26 +204,29 @@
     <!-- Main content area -->
     <div class="flex flex-col flex-1">
         <!-- Header -->
-        <header class="flex items-center justify-between p-4 bg-[#212121] border-b border-gray-700 shadow-md h-16">
-            <!-- Mobile hamburger button (hidden on md and larger screens) -->
-            <button id="mobile-hamburger-button" class="md:hidden p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
+        <header class="flex items-center p-4 bg-[#212121] border-b border-gray-700 shadow-md h-16">
+            <!-- Left container for hamburger/toggle button. This will take up space. -->
+            <div class="flex items-center flex-grow justify-start">
+                <!-- Mobile hamburger button (hidden on md and larger screens) -->
+                <button id="mobile-hamburger-button" class="md:hidden p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
 
-            <!-- Desktop sidebar toggle button (hidden on mobile) -->
-            <button id="desktop-sidebar-toggle-button" class="hidden md:block p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
+                <!-- Desktop sidebar toggle button (hidden on mobile) -->
+                <button id="desktop-sidebar-toggle-button" class="hidden md:block p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
 
             <!-- Supple AI title (always centered) -->
-            <h1 class="text-2xl font-bold text-gray-100 flex-grow text-center">Supple AI</h1>
+            <h1 class="text-2xl font-bold text-gray-100 flex-shrink-0">Supple AI</h1>
 
-            <!-- Login/Account Info -->
-            <div class="flex items-center flex-shrink-0">
+            <!-- Right container for login/account info. This will also take up space. -->
+            <div class="flex items-center flex-grow justify-end">
                 <button id="login-button" class="px-4 py-2 text-sm font-medium text-gray-100 bg-[#303030] rounded-lg hover:bg-[#212121] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
                     로그인
                 </button>
